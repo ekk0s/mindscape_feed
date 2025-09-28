@@ -1,31 +1,46 @@
-{{! Feed page }}
-<section class="mind-feed container my-4">
+{{! 
+    Feed template for the Mindscape feed plugin.
+    This template renders the form for creating new posts, the list of
+    existing posts, their attachments and comments, and forms for adding
+    comments.  Display elements are conditioned on the capabilities
+    (canpost and cancomment) passed from the feed_page renderable.
+}}
+
+<section class="local-mindscape-feed container my-4">
   {{#canpost}}
-  <form class="card p-3 mb-3" method="post" action="{{{postformaction}}}">
-    {{#pix}} i/add, core {{/pix}}
-    <textarea name="content" class="form-control my-2" rows="3" placeholder="{{#str}} writepost, local_mindscape_feed {{/str}}"></textarea>
+  <form class="card p-3 mb-3" method="post" action="{{{postformaction}}}" enctype="multipart/form-data">
+    <div class="mb-2">
+      <textarea name="content" class="form-control" rows="3" placeholder="{{#str}}writepost, local_mindscape_feed{{/str}}"></textarea>
+    </div>
+    <div class="mb-2">
+      <input type="file" name="attachments[]" multiple class="form-control" />
+    </div>
     <input type="hidden" name="sesskey" value="{{sesskey}}">
-    <button class="btn btn-primary">{{#str}} publish, local_mindscape_feed {{/str}}</button>
+    <button type="submit" class="btn btn-primary">{{#str}}publish, local_mindscape_feed{{/str}}</button>
   </form>
   {{/canpost}}
 
   {{#posts}}
-  <article class="card p-3 mb-3">
+  <article class="card p-3 mb-3" id="p{{id}}">
     <header class="d-flex align-items-center gap-2 mb-2">
       {{{userpic}}}
       <strong>{{fullname}}</strong>
       <span class="text-muted ms-auto">{{time}}</span>
     </header>
     <div class="feed-content mb-2">{{{content}}}</div>
-
+    {{#attachments}}
+      <div class="attachment mb-1">
+        <a href="{{{url}}}" target="_blank">{{filename}}</a>
+      </div>
+    {{/attachments}}
+    {{#attachments}}{{/attachments}}
     {{#canmoderate}}
-      <form method="post" action="{{config.wwwroot}}/local/mindscape_feed/delete.php" onsubmit="return confirm('{{#str}} confirmdelete, local_mindscape_feed {{/str}}')">
-        <input type="hidden" name="postid" value="{{id}}">
-        <input type="hidden" name="sesskey" value="{{sesskey}}">
-        <button class="btn btn-sm btn-outline-danger">{{#str}} delete, local_mindscape_feed {{/str}}</button>
-      </form>
+    <form method="post" action="{{{deleteformaction}}}" class="mb-2" onsubmit="return confirm('{{#str}}confirmdelete, local_mindscape_feed{{/str}}');">
+      <input type="hidden" name="postid" value="{{id}}">
+      <input type="hidden" name="sesskey" value="{{sesskey}}">
+      <button class="btn btn-sm btn-outline-danger">{{#str}}delete, local_mindscape_feed{{/str}}</button>
+    </form>
     {{/canmoderate}}
-
     <section class="comments mt-3">
       {{#comments}}
       <div class="d-flex align-items-start gap-2 mb-2">
@@ -38,17 +53,23 @@
       </div>
       {{/comments}}
       {{^comments}}
-        <div class="text-muted">{{#str}} nocomments, local_mindscape_feed {{/str}}</div>
+        <div class="text-muted">{{#str}}nocomments, local_mindscape_feed{{/str}}</div>
       {{/comments}}
 
-      {{#../cancomment}}
+      {{#cancomment}}
       <form class="mt-2" method="post" action="{{{commentformaction}}}">
-        <textarea name="content" class="form-control mb-2" rows="2" placeholder="{{#str}} comment, local_mindscape_feed {{/str}}"></textarea>
-        <input type="hidden" name="sesskey" value="{{sesskey}}">
-        <button class="btn btn-sm btn-outline-primary">{{#str}} comment, local_mindscape_feed {{/str}}</button>
+        <div class="input-group">
+          <textarea name="content" class="form-control" rows="2" placeholder="{{#str}}comment, local_mindscape_feed{{/str}}"></textarea>
+          <input type="hidden" name="sesskey" value="{{sesskey}}">
+          <button class="btn btn-outline-primary">{{#str}}comment, local_mindscape_feed{{/str}}</button>
+        </div>
       </form>
-      {{/../cancomment}}
+      {{/cancomment}}
     </section>
   </article>
+  {{/posts}}
+
+  {{^posts}}
+  <div class="alert alert-info">{{#str}}nopostsyet, local_mindscape_feed{{/str}}</div>
   {{/posts}}
 </section>
