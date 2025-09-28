@@ -1,0 +1,54 @@
+{{! Feed page }}
+<section class="mind-feed container my-4">
+  {{#canpost}}
+  <form class="card p-3 mb-3" method="post" action="{{{postformaction}}}">
+    {{#pix}} i/add, core {{/pix}}
+    <textarea name="content" class="form-control my-2" rows="3" placeholder="{{#str}} writepost, local_mindscape_feed {{/str}}"></textarea>
+    <input type="hidden" name="sesskey" value="{{sesskey}}">
+    <button class="btn btn-primary">{{#str}} publish, local_mindscape_feed {{/str}}</button>
+  </form>
+  {{/canpost}}
+
+  {{#posts}}
+  <article class="card p-3 mb-3">
+    <header class="d-flex align-items-center gap-2 mb-2">
+      {{{userpic}}}
+      <strong>{{fullname}}</strong>
+      <span class="text-muted ms-auto">{{time}}</span>
+    </header>
+    <div class="feed-content mb-2">{{{content}}}</div>
+
+    {{#canmoderate}}
+      <form method="post" action="{{config.wwwroot}}/local/mindscape_feed/delete.php" onsubmit="return confirm('{{#str}} confirmdelete, local_mindscape_feed {{/str}}')">
+        <input type="hidden" name="postid" value="{{id}}">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <button class="btn btn-sm btn-outline-danger">{{#str}} delete, local_mindscape_feed {{/str}}</button>
+      </form>
+    {{/canmoderate}}
+
+    <section class="comments mt-3">
+      {{#comments}}
+      <div class="d-flex align-items-start gap-2 mb-2">
+        {{{userpic}}}
+        <div>
+          <div><strong>{{fullname}}</strong></div>
+          <div>{{{content}}}</div>
+          <small class="text-muted">{{time}}</small>
+        </div>
+      </div>
+      {{/comments}}
+      {{^comments}}
+        <div class="text-muted">{{#str}} nocomments, local_mindscape_feed {{/str}}</div>
+      {{/comments}}
+
+      {{#../cancomment}}
+      <form class="mt-2" method="post" action="{{{commentformaction}}}">
+        <textarea name="content" class="form-control mb-2" rows="2" placeholder="{{#str}} comment, local_mindscape_feed {{/str}}"></textarea>
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <button class="btn btn-sm btn-outline-primary">{{#str}} comment, local_mindscape_feed {{/str}}</button>
+      </form>
+      {{/../cancomment}}
+    </section>
+  </article>
+  {{/posts}}
+</section>
