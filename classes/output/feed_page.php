@@ -99,13 +99,21 @@ class feed_page implements renderable, templatable {
             $commentitems = [];
             foreach ($comments as $comment) {
                 $commentuser = \core_user::get_user($comment->userid);
+                // Determine if the current user owns the comment.
+                $iscommentowner = ($comment->userid == $USER->id);
                 $commentitems[] = [
                     'userpic' => $output->user_picture($commentuser, ['size' => 25]),
                     'fullname' => fullname($commentuser),
                     'content' => format_text($comment->content, FORMAT_HTML, ['context' => $systemcontext, 'filter' => true]),
                     'time' => userdate($comment->timecreated),
+                    'iscommentowner' => $iscommentowner,
+                    // URL for editing the comment.
+                    'commentediturl' => (new \moodle_url('/local/mindscape_feed/editcomment.php', ['id' => $comment->id]))->out(false),
                 ];
             }
+            // Calculate likes information.
+            $likescount = $DB->count_records('local_mindscape_likes', ['postid' => $post->id]);
+            $likedbyuser = $DB->record_exists('local_mindscape_likes', ['postid' => $post->id, 'userid' => $USER->id]);
             $items[] = [
                 'id' => $post->id,
                 'userpic' => $output->user_picture($postuser, ['size' => 35]),
@@ -115,7 +123,12 @@ class feed_page implements renderable, templatable {
                 'attachments' => $attachments,
                 'isowner' => $post->userid == $USER->id,
                 'canmoderate' => $canmoderate,
+                'likes' => [
+                    'count' => $likescount,
+                    'liked' => $likedbyuser,
+                ],
                 'comments' => $commentitems,
+                'editurl' => (new \moodle_url('/local/mindscape_feed/editpost.php', ['id' => $post->id]))->out(false),
                 'commentformaction' => (new \moodle_url('/local/mindscape_feed/comment.php', ['postid' => $post->id]))->out(false),
                 'deleteformaction' => (new \moodle_url('/local/mindscape_feed/delete.php'))->out(false),
             ];
@@ -124,6 +137,7 @@ class feed_page implements renderable, templatable {
         return [
             'canpost' => $canpost,
             'cancomment' => $cancomment,
+            'canmoderate' => $canmoderate,
             'posts' => $items,
             'postformaction' => (new \moodle_url('/local/mindscape_feed/post.php'))->out(false),
             'sesskey' => sesskey(),

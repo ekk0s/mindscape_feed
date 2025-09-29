@@ -29,6 +29,12 @@ $PAGE->set_title(get_string('pluginname', 'local_mindscape_feed'));
 $PAGE->set_heading(get_string('pluginname', 'local_mindscape_feed'));
 
 // Render the feed page using our renderable and template.
+// Include our AMD JavaScript for interactive actions.
+// The feedactions module handles like/unlike; the postactions module
+// handles asynchronous submission of posts and comments.
+$PAGE->requires->js_call_amd('local_mindscape_feed/feedactions', 'init');
+$PAGE->requires->js_call_amd('local_mindscape_feed/postactions', 'init');
+
 $renderable = new \local_mindscape_feed\output\feed_page();
 
 echo $OUTPUT->header();

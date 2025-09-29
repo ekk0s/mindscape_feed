@@ -68,5 +68,16 @@ if (trim($content) !== '' || !empty($_FILES['attachments']['name'][0])) {
     }
 }
 
+// If this was an AJAX submission, return a JSON response instead of redirecting.
+$isajax = optional_param('ajax', 0, PARAM_BOOL);
+if ($isajax) {
+    // Indicate success so the JS can refresh or update the UI as needed.  We
+    // could return additional data here (e.g. new post HTML) but reloading
+    // the page is sufficient for now.
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true]);
+    exit;
+}
+
 // Redirect back to the feed page after posting.
 redirect(new moodle_url('/local/mindscape_feed/index.php'));

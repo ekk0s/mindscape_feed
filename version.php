@@ -16,10 +16,13 @@ $plugin->component = 'local_mindscape_feed';
 // format is YYYYMMDDXX where XX is a two‑digit sequence number within the
 // day.
 // Bumped after adding attachment support (file uploads).
-$plugin->version   = 2025092804;
+// Bumped after adding editing and likes support.
+// Bumped after adding asynchronous like/unlike support (AJAX interactions).
+// Bumped after adding like notification events and messages (users are notified when their post is liked).
+$plugin->version   = 2025092809;
 // Minimum Moodle version required (Moodle 4.4+; Moodle 5.0 accepts the same).
 $plugin->requires  = 2024042200;
 // Plugin maturity level.
 $plugin->maturity  = MATURITY_ALPHA;
 // Human readable release information.
-$plugin->release   = '0.3.0';
+$plugin->release   = '0.8.0';

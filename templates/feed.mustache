@@ -8,15 +8,19 @@
 
 <section class="local-mindscape-feed container my-4">
   {{#canpost}}
-  <form class="card p-3 mb-3" method="post" action="{{{postformaction}}}" enctype="multipart/form-data">
+  <form class="card shadow-sm p-3 mb-3 mindscape-post-form" method="post" action="{{{postformaction}}}" enctype="multipart/form-data" data-ajax="1">
     <div class="mb-2">
-      <textarea name="content" class="form-control" rows="3" placeholder="{{#str}}writepost, local_mindscape_feed{{/str}}"></textarea>
+      <textarea name="content" class="form-control border rounded mb-2" rows="3" placeholder="{{#str}}writepost, local_mindscape_feed{{/str}}"></textarea>
     </div>
-    <div class="mb-2">
-      <input type="file" name="attachments[]" multiple class="form-control" />
+    <div class="mb-3 d-flex align-items-center">
+      <!-- Hidden file input and icon button for attachments -->
+      <input id="mindscape-attach-input" type="file" name="attachments[]" multiple class="d-none">
+      <label for="mindscape-attach-input" class="btn btn-outline-secondary btn-sm me-2" title="{{#str}}attachfile, local_mindscape_feed{{/str}}">
+        <i class="fa fa-paperclip"></i>
+      </label>
+      <input type="hidden" name="sesskey" value="{{sesskey}}">
+      <button type="submit" class="btn btn-primary btn-sm">{{#str}}publish, local_mindscape_feed{{/str}}</button>
     </div>
-    <input type="hidden" name="sesskey" value="{{sesskey}}">
-    <button type="submit" class="btn btn-primary">{{#str}}publish, local_mindscape_feed{{/str}}</button>
   </form>
   {{/canpost}}
 
@@ -34,8 +38,33 @@
       </div>
     {{/attachments}}
     {{#attachments}}{{/attachments}}
+
+    <!-- Like/unlike button with count -->
+    <form class="d-inline me-2 mindscape-like-form" data-liked="{{likes.liked}}" data-postid="{{id}}" method="post" action="/local/mindscape_feed/like.php">
+      <input type="hidden" name="postid" value="{{id}}">
+      <input type="hidden" name="sesskey" value="{{sesskey}}">
+      {{#likes.liked}}
+        <button type="submit" name="action" value="unlike" class="btn btn-sm btn-secondary">{{#str}}unlike, local_mindscape_feed{{/str}}</button>
+      {{/likes.liked}}
+      {{^likes.liked}}
+        <button type="submit" name="action" value="like" class="btn btn-sm btn-outline-secondary">{{#str}}like, local_mindscape_feed{{/str}}</button>
+      {{/likes.liked}}
+      <span class="ms-1 mindscape-like-count">{{likes.count}}</span>
+    </form>
+
+    <!-- Edit button for post -->
+    {{#isowner}}
+      <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+    {{/isowner}}
+    {{^isowner}}
+      {{#canmoderate}}
+        <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+      {{/canmoderate}}
+    {{/isowner}}
+
+    <!-- Delete button -->
     {{#canmoderate}}
-    <form method="post" action="{{{deleteformaction}}}" class="mb-2" onsubmit="return confirm('{{#str}}confirmdelete, local_mindscape_feed{{/str}}');">
+    <form method="post" action="{{{deleteformaction}}}" class="d-inline" onsubmit="return confirm('{{#str}}confirmdelete, local_mindscape_feed{{/str}}');">
       <input type="hidden" name="postid" value="{{id}}">
       <input type="hidden" name="sesskey" value="{{sesskey}}">
       <button class="btn btn-sm btn-outline-danger">{{#str}}delete, local_mindscape_feed{{/str}}</button>
@@ -49,6 +78,16 @@
           <div><strong>{{fullname}}</strong></div>
           <div>{{{content}}}</div>
           <small class="text-muted">{{time}}</small>
+
+          <!-- Edit button for comment -->
+          {{#iscommentowner}}
+            <a href="{{commentediturl}}" class="btn btn-sm btn-outline-secondary ms-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+          {{/iscommentowner}}
+          {{^iscommentowner}}
+            {{#../canmoderate}}
+              <a href="{{commentediturl}}" class="btn btn-sm btn-outline-secondary ms-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+            {{/../canmoderate}}
+          {{/iscommentowner}}
         </div>
       </div>
       {{/comments}}
@@ -57,7 +96,7 @@
       {{/comments}}
 
       {{#cancomment}}
-      <form class="mt-2" method="post" action="{{{commentformaction}}}">
+      <form class="mt-2 mindscape-comment-form" method="post" action="{{{commentformaction}}}" data-postid="{{id}}" data-ajax="1">
         <div class="input-group">
           <textarea name="content" class="form-control" rows="2" placeholder="{{#str}}comment, local_mindscape_feed{{/str}}"></textarea>
           <input type="hidden" name="sesskey" value="{{sesskey}}">
