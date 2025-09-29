@@ -21,45 +21,51 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event fired when a comment is created on a post in the Mindscape feed.
  *
- * objectid = ID do registro em local_mindscape_comments
- * other['postid'] = ID do post comentado
+ * This event is triggered after a user posts a new comment on an existing
+ * feed post. It records the ID of the new comment (as the objectid) and
+ * includes the parent post ID in the other array. Observers can listen to
+ * this event to perform actions such as notifying the post author.
  *
  * @package    local_mindscape_feed
+ * @copyright  2025 Mindscape
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class comment_created extends \core\event\base {
-
     /**
      * Returns the localized name of the event.
+     *
+     * @return string
      */
-    public static function get_name(): string {
+    public static function get_name() {
         return get_string('eventcommentcreated', 'local_mindscape_feed');
     }
 
     /**
      * Returns a description of what happened.
+     *
+     * @return string
      */
-    public function get_description(): string {
-        $postid = $this->other['postid'] ?? 0;
-        return "The user with id '{$this->userid}' posted a comment with id '{$this->objectid}' on post with id '{$postid}' in the Mindscape feed.";
+    public function get_description() {
+        return "The user with id '{$this->userid}' posted a comment with id '{$this->objectid}' on post with id '" .
+            $this->other['postid'] . "' in the Mindscape feed.";
     }
 
     /**
-     * Returns the URL related to the action (with post anchor).
+     * Returns the URL related to the action.
+     *
+     * @return \moodle_url
      */
-    public function get_url(): \moodle_url {
-        $postid = $this->other['postid'] ?? null;
-        // Terceiro parâmetro é a âncora (sem '#').
-        return new \moodle_url('/local/mindscape_feed/index.php', null, $postid ? ('p'.$postid) : null);
+    public function get_url() {
+        return new \moodle_url('/local/mindscape_feed/index.php', ['#' => 'p' . $this->other['postid']]);
     }
 
     /**
      * Init the event with the appropriate level and crud type.
-     * IMPORTANT: define objecttable when using objectid.
+     *
+     * @return void
      */
-    protected function init(): void {
-        $this->data['crud']        = 'c';
-        $this->data['edulevel']    = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'local_mindscape_comments';
+    protected function init() {
+        $this->data['crud'] = 'c';
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
 }

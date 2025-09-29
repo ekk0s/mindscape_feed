@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/mindscape_feed/db" VERSION="2025092802" COMMENT="Mindscape feed">
+  <TABLES>
+
+    <TABLE NAME="local_mindscape_posts" COMMENT="Feed posts">
+      <FIELDS>
+        <FIELD NAME="id"           TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid"       TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="content"      TYPE="text"              NOTNULL="true"/>
+        <FIELD NAME="timecreated"  TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timemodified" TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="deleted"      TYPE="int"  LENGTH="1"  NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="timecreated_idx" UNIQUE="false" FIELDS="timecreated"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_mindscape_comments" COMMENT="Feed comments">
+      <FIELDS>
+        <FIELD NAME="id"          TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="postid"      TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="userid"      TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="content"     TYPE="text"              NOTNULL="true"/>
+        <FIELD NAME="timecreated" TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="deleted"     TYPE="int"  LENGTH="1"  NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="post_fk" TYPE="foreign" FIELDS="postid" REFTABLE="local_mindscape_posts" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="postid_idx" UNIQUE="false" FIELDS="postid"/>
+        <INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- New table for tracking likes on feed posts -->
+    <TABLE NAME="local_mindscape_likes" COMMENT="Feed post likes">
+      <FIELDS>
+        <FIELD NAME="id"      TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="postid"  TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="userid"  TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="post_fk" TYPE="foreign" FIELDS="postid" REFTABLE="local_mindscape_posts" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="postid_idx" UNIQUE="false" FIELDS="postid"/>
+        <INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+        <!-- Ensure that a user can only like a post once. -->
+        <INDEX NAME="unique_like" UNIQUE="true" FIELDS="postid,userid"/>
+      </INDEXES>
+    </TABLE>
+
+  </TABLES>
+</XMLDB>
