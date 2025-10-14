@@ -20,7 +20,8 @@ $plugin->component = 'local_mindscape_feed';
 // Bumped after adding asynchronous like/unlike support (AJAX interactions).
 // Bumped after adding like notification events and messages (users are notified when their post is liked).
 // Bumped after adding upgrade script for likes table and translation fixes.
-$plugin->version   = 2025092811;
+// Bumped after adding debates feature and supporting table.
+$plugin->version   = 2025092812;
 // Minimum Moodle version required (Moodle 4.4+; Moodle 5.0 accepts the same).
 $plugin->requires  = 2024042200;
 // Plugin maturity level.

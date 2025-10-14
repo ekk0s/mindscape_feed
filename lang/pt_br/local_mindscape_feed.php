@@ -48,3 +48,8 @@ $string['postlikenotificationsubject'] = 'Seu post recebeu uma curtida no Feed M
 $string['postlikenotificationmessage'] = '{$a->liker} curtiu seu post: "{$a->postcontent}".\nVeja: {$a->url}';
 // HTML notification message for a like. Same placeholders as above; use HTML formatting.
 $string['postlikenotificationmessagehtml'] = '<p><strong>{$a->liker}</strong> curtiu seu post:</p><blockquote>{$a->postcontent}</blockquote><p>Veja <a href="{$a->url}">aqui</a>.</p>';
+
+$string['weeklydebates'] = 'Debates da semana';
+$string['viewdiscussion'] = 'Ver discussão';
+$string['nodebates'] = 'Nenhum debate ativo no momento.';
+
