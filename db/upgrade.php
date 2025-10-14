@@ -93,5 +93,23 @@ function xmldb_local_mindscape_feed_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2025092812, 'local', 'mindscape_feed');
     }
 
+    // Add a field to link a debate to a Kialo course module. This field is
+    // optional and will be used when a debate is represented by an activity
+    // created via the mod_kialo plugin. If the field is null, the debate
+    // falls back to a regular feed discussion only. We use a simple integer
+    // field pointing at the course_modules.id of the Kialo activity.
+    if ($oldversion < 2025101400) {
+        $table = new xmldb_table('local_mindscape_debates');
+        $field = new xmldb_field('kialo_cmid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Only add the field if it does not already exist.
+        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Record the upgrade savepoint.
+        upgrade_plugin_savepoint(true, 2025101400, 'local', 'mindscape_feed');
+    }
+
     return true;
 }

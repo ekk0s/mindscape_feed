@@ -43,3 +43,9 @@ $string['weeklydebates'] = 'Weekly debates';
 $string['viewdiscussion'] = 'View discussion';
 $string['nodebates'] = 'No active debates at the moment.';
 
+// Navigation link to the weekly debates page.
+$string['viewdebates'] = 'View weekly debates';
+
+// Button label used on the debates page when a Kialo activity is linked to a debate.
+$string['participatedebate'] = 'Participate in debate';
+

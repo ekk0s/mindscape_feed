@@ -7,8 +7,11 @@
         </div>
         <div class="card-footer text-muted d-flex justify-content-between align-items-center">
             <small>{{weekstart}}</small>
+            {{#kialourl}}
+                <a class="btn btn-primary btn-sm" href="{{.}}">{{#str}}participatedebate, local_mindscape_feed{{/str}}</a>
+            {{/kialourl}}
             {{#posturl}}
-                <a class="btn btn-primary btn-sm" href="{{.}}">{{#str}}viewdiscussion, local_mindscape_feed{{/str}}</a>
+                <a class="btn btn-secondary btn-sm" href="{{.}}">{{#str}}viewdiscussion, local_mindscape_feed{{/str}}</a>
             {{/posturl}}
         </div>
     </div>

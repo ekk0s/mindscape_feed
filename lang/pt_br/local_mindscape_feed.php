@@ -53,3 +53,9 @@ $string['weeklydebates'] = 'Debates da semana';
 $string['viewdiscussion'] = 'Ver discussão';
 $string['nodebates'] = 'Nenhum debate ativo no momento.';
 
+// Texto do link para a página de debates da semana.
+$string['viewdebates'] = 'Ver debates da semana';
+
+// Rótulo do botão usado na página de debates quando uma atividade Kialo está vinculada a um debate.
+$string['participatedebate'] = 'Participar do debate';
+

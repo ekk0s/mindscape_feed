@@ -24,6 +24,12 @@
   </form>
   {{/canpost}}
 
+  <!-- Button linking to the weekly debates page. This provides a direct
+       navigation option so users don’t have to manually enter the URL. -->
+  <div class="mb-3">
+    <a class="btn btn-outline-primary btn-sm" href="{{debatesurl}}">{{#str}}viewdebates, local_mindscape_feed{{/str}}</a>
+  </div>
+
   {{#posts}}
   <article class="card p-3 mb-3" id="p{{id}}">
     <header class="d-flex align-items-center gap-2 mb-2">

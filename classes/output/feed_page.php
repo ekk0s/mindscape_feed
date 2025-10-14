@@ -121,6 +121,11 @@ class feed_page implements renderable, templatable {
             'posts' => $items,
             'postformaction' => (new \moodle_url('/local/mindscape_feed/post.php'))->out(false),
             'sesskey' => sesskey(), // usado como <input type="hidden" name="sesskey" ...> nos forms
+            // URL to the weekly debates page. This allows the template to render
+            // a button linking directly to the debates listing without requiring users
+            // to manually type the URL. It is always included regardless of
+            // capabilities, so any logged-in user can navigate there.
+            'debatesurl' => (new \moodle_url('/local/mindscape_feed/debates.php'))->out(false),
         ];
     }
 }

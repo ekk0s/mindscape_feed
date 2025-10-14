@@ -55,9 +55,17 @@ class debates_page implements renderable, templatable {
             $description = format_text($record->description, FORMAT_HTML, ['context' => $context]);
             $weekstart = userdate($record->weekstart);
 
+            // Build a URL back to the corresponding feed post if a postid is defined.
             $posturl = null;
-            if ($record->postid !== null) {
+            if (!empty($record->postid)) {
                 $posturl = (new moodle_url('/local/mindscape_feed/index.php', [], 'p' . $record->postid))->out(false);
+            }
+
+            // Build a URL to the Kialo activity if a course module id has been provided. When linking
+            // to the Kialo plugin we direct the user to the standard view.php script in mod_kialo.
+            $kialourl = null;
+            if (!empty($record->kialo_cmid)) {
+                $kialourl = (new moodle_url('/mod/kialo/view.php', ['id' => $record->kialo_cmid]))->out(false);
             }
 
             $debates[] = [
@@ -65,6 +73,7 @@ class debates_page implements renderable, templatable {
                 'description' => $description,
                 'weekstart' => $weekstart,
                 'posturl' => $posturl,
+                'kialourl' => $kialourl,
             ];
         }
 
