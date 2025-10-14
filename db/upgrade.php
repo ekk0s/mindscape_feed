@@ -69,5 +69,29 @@ function xmldb_local_mindscape_feed_upgrade(int $oldversion): bool {
         }
     }
 
+    if ($oldversion < 2025092812) {
+        // Define table local_mindscape_debates to be created.
+        $table = new xmldb_table('local_mindscape_debates');
+
+        // Define fields for the debates table.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('postid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('weekstart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('active', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Define keys for the debates table.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Create the table if it does not already exist.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2025092812, 'local', 'mindscape_feed');
+    }
+
     return true;
 }

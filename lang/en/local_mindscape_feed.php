@@ -39,3 +39,7 @@ $string['eventpostliked'] = 'Post liked in Mindscape feed';
 $string['postlikenotificationsubject'] = 'Your post was liked in the Mindscape feed';
 $string['postlikenotificationmessage'] = '{$a->liker} liked your post: "{$a->postcontent}".\nView: {$a->url}';
 $string['postlikenotificationmessagehtml'] = '<p><strong>{$a->liker}</strong> liked your post:</p><blockquote>{$a->postcontent}</blockquote><p>View <a href="{$a->url}">here</a>.</p>';
+$string['weeklydebates'] = 'Weekly debates';
+$string['viewdiscussion'] = 'View discussion';
+$string['nodebates'] = 'No active debates at the moment.';
+
