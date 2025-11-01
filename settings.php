@@ -24,4 +24,14 @@ if ($h = new admin_category('local_mindscape_feed_cat', get_string('pluginname',
         ));
     }
     $ADMIN->add('localplugins', $settings);
+
+    // Provide an admin page for managing weekly debates. This link will
+    // only be visible to users who have the managedebates capability. It
+    // directs to manage_debates.php where new debates can be created.
+    $ADMIN->add('localplugins', new admin_externalpage(
+        'local_mindscape_feed_managedebates',
+        get_string('managedebates', 'local_mindscape_feed'),
+        new moodle_url('/local/mindscape_feed/manage_debates.php'),
+        'local/mindscape_feed:managedebates'
+    ));
 }

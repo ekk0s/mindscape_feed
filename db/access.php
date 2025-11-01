@@ -44,4 +44,16 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
+
+    // Capability that allows a user to manage weekly debates (create new debates
+    // and view existing ones). Grant this to managers by default. Teachers
+    // or other roles can be assigned this capability if they should manage
+    // debates.
+    'local/mindscape_feed:managedebates' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ],
+    ],
 ];

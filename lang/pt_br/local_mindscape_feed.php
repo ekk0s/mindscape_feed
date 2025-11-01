@@ -55,6 +55,19 @@ $string['nodebates'] = 'Nenhum debate ativo no momento.';
 
 // Texto do link para a página de debates da semana.
 $string['viewdebates'] = 'Ver debates da semana';
+// Strings da página de gerenciamento.
+$string['managedebates'] = 'Gerenciar debates da semana';
+$string['existingdebates'] = 'Debates existentes';
+$string['adddebate'] = 'Adicionar novo debate';
+$string['debatecreated'] = 'Debate criado com sucesso';
+
+// Campos do formulário de debate.
+$string['title'] = 'Título';
+$string['description'] = 'Descrição';
+$string['weekstart'] = 'Início da semana';
+$string['active'] = 'Ativo';
+$string['kialo_cmid'] = 'ID da atividade Kialo';
+$string['kialo_cmid_help'] = 'Opcional: informe o ID do módulo de curso de uma atividade Kialo existente para vincular este debate a ela.';
 
 // Rótulo do botão usado na página de debates quando uma atividade Kialo está vinculada a um debate.
 $string['participatedebate'] = 'Participar do debate';

@@ -45,6 +45,19 @@ $string['nodebates'] = 'No active debates at the moment.';
 
 // Navigation link to the weekly debates page.
 $string['viewdebates'] = 'View weekly debates';
+// Management page strings.
+$string['managedebates'] = 'Manage weekly debates';
+$string['existingdebates'] = 'Existing debates';
+$string['adddebate'] = 'Add a new debate';
+$string['debatecreated'] = 'Debate created successfully';
+
+// Debate form field strings.
+$string['title'] = 'Title';
+$string['description'] = 'Description';
+$string['weekstart'] = 'Week start';
+$string['active'] = 'Active';
+$string['kialo_cmid'] = 'Kialo activity ID';
+$string['kialo_cmid_help'] = 'Optional: enter the course module ID of an existing Kialo activity to link this debate to it.';
 
 // Button label used on the debates page when a Kialo activity is linked to a debate.
 $string['participatedebate'] = 'Participate in debate';
