@@ -38,6 +38,9 @@ $PAGE->set_url(new moodle_url('/local/mindscape_feed/adddebate.php'));
 $PAGE->set_title(get_string('navadddebate', 'local_mindscape_feed'));
 $PAGE->set_heading(get_string('navadddebate', 'local_mindscape_feed'));
 
+// Load the custom stylesheet for a consistent appearance with the feed.
+$PAGE->requires->css('/local/mindscape_feed/styles.css');
+
 $errors = [];
 
 if (data_submitted() && confirm_sesskey()) {

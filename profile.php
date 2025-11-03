@@ -116,6 +116,10 @@ $PAGE->set_title(fullname($user));
 $PAGE->set_heading(fullname($user));
 $PAGE->set_pagelayout('standard');
 
+// Include custom styles for the Mindscape Feed.  Adding the CSS here
+// ensures the profile page uses the same look and feel as the feed.
+$PAGE->requires->css('/local/mindscape_feed/styles.css');
+
 $profilepage = new local_mindscape_feed\output\profile_page($userid);
 
 echo $OUTPUT->header();

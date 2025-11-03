@@ -49,6 +49,10 @@ $PAGE->set_title(format_string($kialo->name, true, ['context' => $context]));
 $PAGE->set_heading(format_string($course->fullname, true, ['context' => context_course::instance($course->id)]));
 $PAGE->set_pagelayout('incourse');
 
+// Include custom styles so the Kialo wrapper inherits the Mindscape Feed
+// appearance.  This call must precede the header output.
+$PAGE->requires->css('/local/mindscape_feed/styles.css');
+
 echo $OUTPUT->header();
 
 // Generate the URL to the original Kialo view page.  We pass the id parameter but do not

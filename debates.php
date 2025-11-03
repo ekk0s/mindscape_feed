@@ -37,6 +37,10 @@ $PAGE->set_title(get_string('weeklydebates', 'local_mindscape_feed'));
 $PAGE->set_heading(get_string('weeklydebates', 'local_mindscape_feed'));
 $PAGE->set_pagelayout('standard');
 
+// Load the custom stylesheet for the Mindscape Feed.  This call must come
+// after setting up the page context but before outputting the header.
+$PAGE->requires->css('/local/mindscape_feed/styles.css');
+
 $page = new local_mindscape_feed\output\debates_page();
 
 echo $OUTPUT->header();

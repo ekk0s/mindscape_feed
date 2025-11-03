@@ -1,0 +1,148 @@
+/*
+ * Custom styles for the Mindscape Feed plugin.
+ *
+ * These rules provide a modern, minimalistic interface for the feed,
+ * profile and debates pages.  Soft colours, generous white space and
+ * subtle shadows are used throughout to keep the interface clean and
+ * uncluttered.  CSS variables allow easy adjustment of the colour
+ * palette.  The decorative background image is optional – remove the
+ * url() if you prefer a plain background.
+ */
+
+/* Colour palette and sizing variables.  Adjust these values to
+ * customise the look and feel of the plugin.  The primary colour is
+ * used for buttons and links, while the secondary colour is used for
+ * text accents.  The card background defines the panels for posts
+ * and forms.  The border radius controls rounding on cards and
+ * images.
+ */
+:root {
+    --ms-background: #f8f9fa;
+    --ms-card-bg: #ffffff;
+    --ms-primary: #0d6efd;
+    --ms-secondary: #6c757d;
+    --ms-border-radius: 0.5rem;
+    --ms-shadow-sm: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+    --ms-shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+/* Global page background and typography.  A soft grey background
+ * combined with a fixed decorative graphic creates an unobtrusive
+ * backdrop.  If you wish to use a plain colour, remove the url() or
+ * replace it with another image in the pix directory.
+ */
+body {
+    background: var(--ms-background) url("/local/mindscape_feed/pix/background.png") no-repeat center top fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    color: #333;
+    line-height: 1.5;
+}
+
+/* Sidebar navigation styling.  The sidebar uses a white card with a
+ * slight shadow.  Navigation links change colour on hover to
+ * reinforce interactivity.  Icons can be added before labels if
+ * desired by editing the Mustache template.
+ */
+.sidebar {
+    background: var(--ms-card-bg);
+    border-radius: var(--ms-border-radius);
+    box-shadow: var(--ms-shadow-sm);
+    padding: 1rem;
+}
+.sidebar .nav-link {
+    color: var(--ms-secondary);
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.sidebar .nav-link:hover,
+.sidebar .nav-link:focus {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: var(--ms-primary);
+    text-decoration: none;
+}
+
+/* Card styling for posts, forms and debate items.  Cards remove the
+ * default Bootstrap border and apply a custom background and shadow.
+ */
+.card {
+    background: var(--ms-card-bg);
+    border: none;
+    border-radius: var(--ms-border-radius);
+    box-shadow: var(--ms-shadow-sm);
+}
+.card header {
+    font-size: 0.95rem;
+    color: var(--ms-secondary);
+}
+
+/* Post and comment content.  Increase line-height for better
+ * readability.  The feed content area inherits the body font size.
+ */
+.feed-content {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Attachments.  Images are displayed inline with rounded corners and
+ * a light shadow.  Non-image files remain as links.
+ */
+.attachment img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--ms-border-radius);
+    margin-bottom: 0.5rem;
+    box-shadow: var(--ms-shadow-sm);
+}
+
+/* Button customisations.  Outline variants receive subtle
+ * improvements: slightly softer border colours and transparent
+ * backgrounds on hover.  Primary outlines invert on hover to
+ * indicate active state.  Secondary outlines retain their grey
+ * palette.
+ */
+.btn-outline-secondary {
+    color: var(--ms-secondary);
+    border-color: #dee2e6;
+}
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+    background-color: #f8f9fa;
+    color: var(--ms-secondary);
+}
+.btn-outline-primary {
+    color: var(--ms-primary);
+    border-color: var(--ms-primary);
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background-color: var(--ms-primary);
+    color: #fff;
+}
+
+/* Comment section.  A thin top border distinguishes the comments
+ * area from the post body.  Add spacing above the first comment.
+ */
+.comments {
+    border-top: 1px solid #e9ecef;
+    padding-top: 0.75rem;
+}
+
+/* Friend list and requests spacing.  The list-unstyled class is
+ * reused on the profile page to align friend avatars and names.
+ */
+.list-unstyled li {
+    padding: 0.25rem 0;
+}
+
+/* Profile page heading size.  Reduce margin between the avatar and
+ * name to keep the profile card compact.  This rule targets the
+ * default heading inside the profile card.  Use more generic
+ * selectors if you add additional headings.
+ */
+.card-body.text-center h2 {
+    font-size: 1.5rem;
+    margin-top: 0.75rem;
+}
