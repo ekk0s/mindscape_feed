@@ -61,11 +61,12 @@ class debates_page implements renderable, templatable {
                 $posturl = (new moodle_url('/local/mindscape_feed/index.php', [], 'p' . $record->postid))->out(false);
             }
 
-            // Build a URL to the Kialo activity if a course module id has been provided. When linking
-            // to the Kialo plugin we direct the user to the standard view.php script in mod_kialo.
+            // Build a URL to the Kialo activity if a course module id has been provided.
+            // Rather than sending users directly to the mod_kialo view page, route them
+            // through the local Mindscape wrapper page which embeds the Kialo activity.
             $kialourl = null;
             if (!empty($record->kialo_cmid)) {
-                $kialourl = (new moodle_url('/mod/kialo/view.php', ['id' => $record->kialo_cmid]))->out(false);
+                $kialourl = (new moodle_url('/local/mindscape_feed/kialo.php', ['id' => $record->kialo_cmid]))->out(false);
             }
 
             $debates[] = [

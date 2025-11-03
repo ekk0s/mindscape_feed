@@ -1,21 +1,23 @@
-<h2>{{#str}}weeklydebates, local_mindscape_feed{{/str}}</h2>
-{{#debates}}
-    <div class="card mb-3">
-        <div class="card-body">
-            <h3 class="card-title">{{title}}</h3>
-            <div class="card-text">{{{description}}}</div>
-        </div>
-        <div class="card-footer text-muted d-flex justify-content-between align-items-center">
-            <small>{{weekstart}}</small>
-            {{#kialourl}}
-                <a class="btn btn-primary btn-sm" href="{{.}}">{{#str}}participatedebate, local_mindscape_feed{{/str}}</a>
-            {{/kialourl}}
-            {{#posturl}}
-                <a class="btn btn-secondary btn-sm" href="{{.}}">{{#str}}viewdiscussion, local_mindscape_feed{{/str}}</a>
-            {{/posturl}}
-        </div>
+{{! Template for listing weekly debates in the Mindscape Feed plugin. }}
+
+<div class="container my-4">
+  <h2>{{#str}}weeklydebates, local_mindscape_feed{{/str}}</h2>
+  {{#debates}}
+    <div class="card mb-3 shadow-sm">
+      <div class="card-body">
+        <h4 class="card-title">{{title}}</h4>
+        <div class="card-text mb-2">{{{description}}}</div>
+        <small class="text-muted">{{weekstart}}</small>
+        {{#posturl}}
+        <div class="mt-2"><a href="{{posturl}}" class="btn btn-sm btn-outline-secondary">{{#str}}viewpost, local_mindscape_feed{{/str}}</a></div>
+        {{/posturl}}
+        {{#kialourl}}
+        <div class="mt-2"><a class="btn btn-sm btn-primary" href="{{kialourl}}">{{#str}}participatedebate, local_mindscape_feed{{/str}}</a></div>
+        {{/kialourl}}
+      </div>
     </div>
-{{/debates}}
-{{^debates}}
+  {{/debates}}
+  {{^debates}}
     <div class="alert alert-info">{{#str}}nodebates, local_mindscape_feed{{/str}}</div>
-{{/debates}}
+  {{/debates}}
+</div>

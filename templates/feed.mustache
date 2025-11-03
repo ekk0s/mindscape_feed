@@ -1,120 +1,128 @@
 {{! 
     Feed template for the Mindscape feed plugin.
-    This template renders the form for creating new posts, the list of
-    existing posts, their attachments and comments, and forms for adding
-    comments.  Display elements are conditioned on the capabilities
+    This template renders the navigation sidebar, the form for creating new posts,
+    the list of existing posts, their attachments and comments, and forms for
+    adding comments.  Display elements are conditioned on the capabilities
     (canpost and cancomment) passed from the feed_page renderable.
 }}
 
-<section class="local-mindscape-feed container my-4">
-  {{#canpost}}
-  <form class="card shadow-sm p-3 mb-3 mindscape-post-form" method="post" action="{{{postformaction}}}" enctype="multipart/form-data" data-ajax="1">
-    <div class="mb-2">
-      <textarea name="content" class="form-control border rounded mb-2" rows="3" placeholder="{{#str}}writepost, local_mindscape_feed{{/str}}"></textarea>
+<!-- Feed page layout: a row with a sidebar for navigation and a central column for the feed -->
+<div class="container-fluid my-4">
+  <div class="row">
+    <!-- Sidebar navigation -->
+    <nav class="col-md-3 col-lg-2 d-none d-md-block sidebar">
+      <div class="p-3">
+        <div class="d-flex align-items-center mb-3">
+          {{{usernav.userpic}}}
+          <span class="ms-2 fw-bold">{{usernav.fullname}}</span>
+        </div>
+        <ul class="nav flex-column">
+          {{#usernav.links}}
+            <li class="nav-item mb-2"><a class="nav-link" href="{{url}}">{{label}}</a></li>
+          {{/usernav.links}}
+        </ul>
+      </div>
+    </nav>
+    <!-- Main feed column; center it and limit width -->
+    <div class="col-md-9 col-lg-6 mx-auto">
+      <section class="local-mindscape-feed">
+        {{#canpost}}
+        <form class="card shadow-sm p-3 mb-3 mindscape-post-form" method="post" action="{{{postformaction}}}" enctype="multipart/form-data" data-ajax="1">
+          <div class="mb-2">
+            <textarea name="content" class="form-control border rounded mb-2" rows="3" placeholder="{{#str}}writepost, local_mindscape_feed{{/str}}"></textarea>
+          </div>
+          <div class="mb-3 d-flex align-items-center">
+            <input id="mindscape-attach-input" type="file" name="attachments[]" multiple class="d-none">
+            <label for="mindscape-attach-input" class="btn btn-outline-secondary btn-sm me-2" title="{{#str}}attachfile, local_mindscape_feed{{/str}}">
+              <i class="fa fa-paperclip"></i>
+            </label>
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <button type="submit" class="btn btn-primary btn-sm">{{#str}}publish, local_mindscape_feed{{/str}}</button>
+          </div>
+        </form>
+        {{/canpost}}
+        <!-- Link to debates page -->
+        <div class="mb-3">
+          <a class="btn btn-outline-primary btn-sm" href="{{debatesurl}}">{{#str}}viewdebates, local_mindscape_feed{{/str}}</a>
+        </div>
+        {{#posts}}
+        <article class="card p-3 mb-3" id="p{{id}}">
+          <header class="d-flex align-items-center gap-2 mb-2">
+            {{{userpic}}}
+            <strong>{{fullname}}</strong>
+            <span class="text-muted ms-auto">{{time}}</span>
+          </header>
+          <div class="feed-content mb-2">{{{content}}}</div>
+          {{#attachments}}
+            <div class="attachment mb-1">
+              <a href="{{{url}}}" target="_blank">{{filename}}</a>
+            </div>
+          {{/attachments}}
+          {{#attachments}}{{/attachments}}
+          <form class="d-inline me-2 mindscape-like-form" data-liked="{{likes.liked}}" data-postid="{{id}}" method="post" action="/local/mindscape_feed/like.php">
+            <input type="hidden" name="postid" value="{{id}}">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            {{#likes.liked}}
+              <button type="submit" name="action" value="unlike" class="btn btn-sm btn-secondary">{{#str}}unlike, local_mindscape_feed{{/str}}</button>
+            {{/likes.liked}}
+            {{^likes.liked}}
+              <button type="submit" name="action" value="like" class="btn btn-sm btn-outline-secondary">{{#str}}like, local_mindscape_feed{{/str}}</button>
+            {{/likes.liked}}
+            <span class="ms-1 mindscape-like-count">{{likes.count}}</span>
+          </form>
+          {{#isowner}}
+            <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+          {{/isowner}}
+          {{^isowner}}
+            {{#canmoderate}}
+              <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+            {{/canmoderate}}
+          {{/isowner}}
+          {{#canmoderate}}
+          <form method="post" action="{{{deleteformaction}}}" class="d-inline" onsubmit="return confirm('{{#str}}confirmdelete, local_mindscape_feed{{/str}}');">
+            <input type="hidden" name="postid" value="{{id}}">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <button class="btn btn-sm btn-outline-danger">{{#str}}delete, local_mindscape_feed{{/str}}</button>
+          </form>
+          {{/canmoderate}}
+          <section class="comments mt-3">
+            {{#comments}}
+            <div class="d-flex align-items-start gap-2 mb-2">
+              {{{userpic}}}
+              <div>
+                <div><strong>{{fullname}}</strong></div>
+                <div>{{{content}}}</div>
+                <small class="text-muted">{{time}}</small>
+                {{#iscommentowner}}
+                  <a href="{{commentediturl}}" class="btn btn-sm btn-outline-secondary ms-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+                {{/iscommentowner}}
+                {{^iscommentowner}}
+                  {{#../canmoderate}}
+                    <a href="{{commentediturl}}" class="btn btn-sm btn-outline-secondary ms-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+                  {{/../canmoderate}}
+                {{/iscommentowner}}
+              </div>
+            </div>
+            {{/comments}}
+            {{^comments}}
+              <div class="text-muted">{{#str}}nocomments, local_mindscape_feed{{/str}}</div>
+            {{/comments}}
+            {{#cancomment}}
+            <form class="mt-2 mindscape-comment-form" method="post" action="{{{commentformaction}}}" data-postid="{{id}}" data-ajax="1">
+              <div class="input-group">
+                <textarea name="content" class="form-control" rows="2" placeholder="{{#str}}comment, local_mindscape_feed{{/str}}"></textarea>
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <button class="btn btn-outline-primary">{{#str}}comment, local_mindscape_feed{{/str}}</button>
+              </div>
+            </form>
+            {{/cancomment}}
+          </section>
+        </article>
+        {{/posts}}
+        {{^posts}}
+        <div class="alert alert-info">{{#str}}nopostsyet, local_mindscape_feed{{/str}}</div>
+        {{/posts}}
+      </section>
     </div>
-    <div class="mb-3 d-flex align-items-center">
-      <!-- Hidden file input and icon button for attachments -->
-      <input id="mindscape-attach-input" type="file" name="attachments[]" multiple class="d-none">
-      <label for="mindscape-attach-input" class="btn btn-outline-secondary btn-sm me-2" title="{{#str}}attachfile, local_mindscape_feed{{/str}}">
-        <i class="fa fa-paperclip"></i>
-      </label>
-      <input type="hidden" name="sesskey" value="{{sesskey}}">
-      <button type="submit" class="btn btn-primary btn-sm">{{#str}}publish, local_mindscape_feed{{/str}}</button>
-    </div>
-  </form>
-  {{/canpost}}
-
-  <!-- Button linking to the weekly debates page. This provides a direct
-       navigation option so users don’t have to manually enter the URL. -->
-  <div class="mb-3">
-    <a class="btn btn-outline-primary btn-sm" href="{{debatesurl}}">{{#str}}viewdebates, local_mindscape_feed{{/str}}</a>
   </div>
-
-  {{#posts}}
-  <article class="card p-3 mb-3" id="p{{id}}">
-    <header class="d-flex align-items-center gap-2 mb-2">
-      {{{userpic}}}
-      <strong>{{fullname}}</strong>
-      <span class="text-muted ms-auto">{{time}}</span>
-    </header>
-    <div class="feed-content mb-2">{{{content}}}</div>
-    {{#attachments}}
-      <div class="attachment mb-1">
-        <a href="{{{url}}}" target="_blank">{{filename}}</a>
-      </div>
-    {{/attachments}}
-    {{#attachments}}{{/attachments}}
-
-    <!-- Like/unlike button with count -->
-    <form class="d-inline me-2 mindscape-like-form" data-liked="{{likes.liked}}" data-postid="{{id}}" method="post" action="/local/mindscape_feed/like.php">
-      <input type="hidden" name="postid" value="{{id}}">
-      <input type="hidden" name="sesskey" value="{{sesskey}}">
-      {{#likes.liked}}
-        <button type="submit" name="action" value="unlike" class="btn btn-sm btn-secondary">{{#str}}unlike, local_mindscape_feed{{/str}}</button>
-      {{/likes.liked}}
-      {{^likes.liked}}
-        <button type="submit" name="action" value="like" class="btn btn-sm btn-outline-secondary">{{#str}}like, local_mindscape_feed{{/str}}</button>
-      {{/likes.liked}}
-      <span class="ms-1 mindscape-like-count">{{likes.count}}</span>
-    </form>
-
-    <!-- Edit button for post -->
-    {{#isowner}}
-      <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
-    {{/isowner}}
-    {{^isowner}}
-      {{#canmoderate}}
-        <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
-      {{/canmoderate}}
-    {{/isowner}}
-
-    <!-- Delete button -->
-    {{#canmoderate}}
-    <form method="post" action="{{{deleteformaction}}}" class="d-inline" onsubmit="return confirm('{{#str}}confirmdelete, local_mindscape_feed{{/str}}');">
-      <input type="hidden" name="postid" value="{{id}}">
-      <input type="hidden" name="sesskey" value="{{sesskey}}">
-      <button class="btn btn-sm btn-outline-danger">{{#str}}delete, local_mindscape_feed{{/str}}</button>
-    </form>
-    {{/canmoderate}}
-    <section class="comments mt-3">
-      {{#comments}}
-      <div class="d-flex align-items-start gap-2 mb-2">
-        {{{userpic}}}
-        <div>
-          <div><strong>{{fullname}}</strong></div>
-          <div>{{{content}}}</div>
-          <small class="text-muted">{{time}}</small>
-
-          <!-- Edit button for comment -->
-          {{#iscommentowner}}
-            <a href="{{commentediturl}}" class="btn btn-sm btn-outline-secondary ms-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
-          {{/iscommentowner}}
-          {{^iscommentowner}}
-            {{#../canmoderate}}
-              <a href="{{commentediturl}}" class="btn btn-sm btn-outline-secondary ms-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
-            {{/../canmoderate}}
-          {{/iscommentowner}}
-        </div>
-      </div>
-      {{/comments}}
-      {{^comments}}
-        <div class="text-muted">{{#str}}nocomments, local_mindscape_feed{{/str}}</div>
-      {{/comments}}
-
-      {{#cancomment}}
-      <form class="mt-2 mindscape-comment-form" method="post" action="{{{commentformaction}}}" data-postid="{{id}}" data-ajax="1">
-        <div class="input-group">
-          <textarea name="content" class="form-control" rows="2" placeholder="{{#str}}comment, local_mindscape_feed{{/str}}"></textarea>
-          <input type="hidden" name="sesskey" value="{{sesskey}}">
-          <button class="btn btn-outline-primary">{{#str}}comment, local_mindscape_feed{{/str}}</button>
-        </div>
-      </form>
-      {{/cancomment}}
-    </section>
-  </article>
-  {{/posts}}
-
-  {{^posts}}
-  <div class="alert alert-info">{{#str}}nopostsyet, local_mindscape_feed{{/str}}</div>
-  {{/posts}}
-</section>
+</div>

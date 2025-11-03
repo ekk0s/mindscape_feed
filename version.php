@@ -1,30 +1,16 @@
 <?php
-/**
- * Version file for the Mindscape feed plugin.
- *
- * This file contains the version information for the plugin. Bump the
- * version whenever database changes are made or new features are added.
- *
- * @package    local_mindscape_feed
- */
+// This file specifies the version of the Mindscape Feed plugin.
+// When you add new features or database tables you should bump the
+// version number.  Moodle will detect the change and run any
+// appropriate upgrade steps (including creating tables defined in
+// install.xml).
 
 defined('MOODLE_INTERNAL') || die();
 
-// The component name (frankenstyle).
 $plugin->component = 'local_mindscape_feed';
-// Increment this number when you release a new version of the plugin. The
-// format is YYYYMMDDXX where XX is a two‑digit sequence number within the
-// day.
-// Bumped after adding attachment support (file uploads).
-// Bumped after adding editing and likes support.
-// Bumped after adding asynchronous like/unlike support (AJAX interactions).
-// Bumped after adding like notification events and messages (users are notified when their post is liked).
-// Bumped after adding upgrade script for likes table and translation fixes.
-// Bumped after adding debates feature and supporting table.
-$plugin->version   = 2025101500; // Updated version after adding debate management interface and Kialo integration
-// Minimum Moodle version required (Moodle 4.4+; Moodle 5.0 accepts the same).
-$plugin->requires  = 2024042200;
-// Plugin maturity level.
+// Version format YYYYMMDDRR where RR is the release number on that day.
+$plugin->version   = 2025110100;
+$plugin->release   = '2025-11-01 (friends system)';
+// Require a relatively modern Moodle (3.4) for proper API support.
+$plugin->requires  = 2017111300;
 $plugin->maturity  = MATURITY_ALPHA;
-// Human readable release information.
-$plugin->release   = '0.12.0';

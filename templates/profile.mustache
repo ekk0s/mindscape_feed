@@ -1,0 +1,166 @@
+{{! 
+    Profile page template for the Mindscape Feed plugin.
+    Displays the user's profile picture, name and their posts.  A placeholder
+    section for friends can be expanded in future.
+}}
+
+<div class="container my-4">
+  <div class="card mb-4">
+    <div class="card-body text-center">
+      <!-- Profile picture -->
+      {{{user.userpic}}}
+      <h2 class="mt-3">{{user.fullname}}</h2>
+      <!-- Friend action buttons for visitors -->
+      {{^user.isowner}}
+        {{#relationship.isfriend}}
+          <span class="badge bg-success">{{#str}}alreadyfriends, local_mindscape_feed{{/str}}</span>
+          <!-- Option to remove an existing friendship -->
+          <form method="post" class="d-inline ms-2" action="?id={{user.id}}&friendaction=remove">
+            <input type="hidden" name="sesskey" value="{{sesskey}}" />
+            <button type="submit" class="btn btn-outline-danger btn-sm">{{#str}}removefriend, local_mindscape_feed{{/str}}</button>
+          </form>
+        {{/relationship.isfriend}}
+        {{#relationship.requestsent}}
+          <button type="button" class="btn btn-outline-secondary btn-sm" disabled>{{#str}}pendingfriend, local_mindscape_feed{{/str}}</button>
+          <!-- Option to cancel a pending friend request -->
+          <form method="post" class="d-inline ms-2" action="?id={{user.id}}&friendaction=cancel">
+            <input type="hidden" name="sesskey" value="{{sesskey}}" />
+            <button type="submit" class="btn btn-outline-secondary btn-sm">{{#str}}cancelrequest, local_mindscape_feed{{/str}}</button>
+          </form>
+        {{/relationship.requestsent}}
+        {{#relationship.incoming}}
+          <form method="post" class="d-inline" action="?id={{user.id}}&friendaction=accept&req={{relationship.relationshipid}}">
+            <input type="hidden" name="sesskey" value="{{sesskey}}" />
+            <button type="submit" class="btn btn-primary btn-sm">{{#str}}acceptfriend, local_mindscape_feed{{/str}}</button>
+          </form>
+        {{/relationship.incoming}}
+        {{^relationship.isfriend}}{{^relationship.requestsent}}{{^relationship.incoming}}
+          <form method="post" class="d-inline" action="?id={{user.id}}&friendaction=send">
+            <input type="hidden" name="sesskey" value="{{sesskey}}" />
+            <button type="submit" class="btn btn-primary btn-sm">{{#str}}addfriend, local_mindscape_feed{{/str}}</button>
+          </form>
+        {{/relationship.incoming}}{{/relationship.requestsent}}{{/relationship.isfriend}}
+      {{/user.isowner}}
+      <!-- Edit controls for the owner -->
+      {{#user.isowner}}
+      <div class="mt-2">
+        <!-- Buttons to edit banner and profile image (placeholders) -->
+        <button type="button" class="btn btn-outline-secondary btn-sm me-2">{{#str}}editbanner, local_mindscape_feed{{/str}}</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm">{{#str}}editprofilepic, local_mindscape_feed{{/str}}</button>
+      </div>
+      {{/user.isowner}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <!-- Friends list -->
+      <h4>{{#str}}friends, local_mindscape_feed{{/str}}</h4>
+      <ul class="list-unstyled">
+        {{#friends}}
+        <li class="d-flex align-items-center mb-2">
+          {{{userpic}}}
+          <a href="{{profileurl}}" class="ms-2">{{fullname}}</a>
+        </li>
+        {{/friends}}
+        {{^friends}}
+        <p class="text-muted">{{#str}}nofriends, local_mindscape_feed{{/str}}</p>
+        {{/friends}}
+      </ul>
+      <!-- Incoming friend requests (only visible to owner) -->
+      {{#user.isowner}}
+      <h5 class="mt-3">{{#str}}friendrequests, local_mindscape_feed{{/str}}</h5>
+      <ul class="list-unstyled">
+        {{#friendrequests}}
+        <li class="d-flex align-items-center mb-2">
+          {{{userpic}}}
+          <a href="{{profileurl}}" class="ms-2">{{fullname}}</a>
+          <form method="post" class="ms-auto" action="{{accepturl}}">
+            <input type="hidden" name="sesskey" value="{{../../../sesskey}}" />
+            <button class="btn btn-sm btn-primary">{{#str}}acceptfriend, local_mindscape_feed{{/str}}</button>
+          </form>
+        </li>
+        {{/friendrequests}}
+        {{^friendrequests}}
+        <p class="text-muted">{{#str}}nofriendrequests, local_mindscape_feed{{/str}}</p>
+        {{/friendrequests}}
+      </ul>
+      {{/user.isowner}}
+    </div>
+    <div class="col-md-8">
+      <h4>{{#str}}posts, local_mindscape_feed{{/str}}</h4>
+      {{#posts}}
+      <article class="card p-3 mb-3">
+        <header class="d-flex align-items-center gap-2 mb-2">
+          {{{userpic}}}
+          <strong>{{fullname}}</strong>
+          <span class="text-muted ms-auto">{{time}}</span>
+        </header>
+        <div class="mb-2">{{{content}}}</div>
+        {{#attachments}}
+        <div class="attachment mb-1">
+          <a href="{{{url}}}" target="_blank">{{filename}}</a>
+        </div>
+        {{/attachments}}
+        {{#attachments}}{{/attachments}}
+        <form class="d-inline me-2 mindscape-like-form" data-liked="{{likes.liked}}" data-postid="{{id}}" method="post" action="/local/mindscape_feed/like.php">
+          <input type="hidden" name="postid" value="{{id}}">
+          <input type="hidden" name="sesskey" value="{{../../sesskey}}">
+          {{#likes.liked}}
+          <button type="submit" name="action" value="unlike" class="btn btn-sm btn-secondary">{{#str}}unlike, local_mindscape_feed{{/str}}</button>
+          {{/likes.liked}}
+          {{^likes.liked}}
+          <button type="submit" name="action" value="like" class="btn btn-sm btn-outline-secondary">{{#str}}like, local_mindscape_feed{{/str}}</button>
+          {{/likes.liked}}
+          <span class="ms-1 mindscape-like-count">{{likes.count}}</span>
+        </form>
+        {{#isowner}}
+        <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+        {{/isowner}}
+        {{#canmoderate}}
+        <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+        <form method="post" action="{{{deleteformaction}}}" class="d-inline" onsubmit="return confirm('{{#str}}confirmdelete, local_mindscape_feed{{/str}}');">
+          <input type="hidden" name="postid" value="{{id}}">
+          <input type="hidden" name="sesskey" value="{{../../sesskey}}">
+          <button class="btn btn-sm btn-outline-danger">{{#str}}delete, local_mindscape_feed{{/str}}</button>
+        </form>
+        {{/canmoderate}}
+        <section class="comments mt-3">
+          {{#comments}}
+          <div class="d-flex align-items-start gap-2 mb-2">
+            {{{userpic}}}
+            <div>
+              <div><strong>{{fullname}}</strong></div>
+              <div>{{{content}}}</div>
+              <small class="text-muted">{{time}}</small>
+              {{#iscommentowner}}
+              <a href="{{commentediturl}}" class="btn btn-sm btn-outline-secondary ms-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+              {{/iscommentowner}}
+              {{^iscommentowner}}
+                {{#../canmoderate}}
+                  <a href="{{commentediturl}}" class="btn btn-sm btn-outline-secondary ms-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
+                {{/../canmoderate}}
+              {{/iscommentowner}}
+            </div>
+          </div>
+          {{/comments}}
+          {{^comments}}
+          <div class="text-muted">{{#str}}nocomments, local_mindscape_feed{{/str}}</div>
+          {{/comments}}
+          {{#../cancomment}}
+          <form class="mt-2 mindscape-comment-form" method="post" action="{{{commentformaction}}}" data-postid="{{id}}" data-ajax="1">
+            <div class="input-group">
+              <textarea name="content" class="form-control" rows="2" placeholder="{{#str}}comment, local_mindscape_feed{{/str}}"></textarea>
+              <input type="hidden" name="sesskey" value="{{../../sesskey}}">
+              <button class="btn btn-outline-primary">{{#str}}comment, local_mindscape_feed{{/str}}</button>
+            </div>
+          </form>
+          {{/../cancomment}}
+        </section>
+      </article>
+      {{/posts}}
+      {{^posts}}
+      <div class="alert alert-info">{{#str}}nopostsyet, local_mindscape_feed{{/str}}</div>
+      {{/posts}}
+    </div>
+  </div>
+</div>

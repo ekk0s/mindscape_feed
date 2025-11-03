@@ -55,20 +55,51 @@ $string['nodebates'] = 'Nenhum debate ativo no momento.';
 
 // Texto do link para a página de debates da semana.
 $string['viewdebates'] = 'Ver debates da semana';
-// Strings da página de gerenciamento.
-$string['managedebates'] = 'Gerenciar debates da semana';
-$string['existingdebates'] = 'Debates existentes';
-$string['adddebate'] = 'Adicionar novo debate';
-$string['debatecreated'] = 'Debate criado com sucesso';
-
-// Campos do formulário de debate.
-$string['title'] = 'Título';
-$string['description'] = 'Descrição';
-$string['weekstart'] = 'Início da semana';
-$string['active'] = 'Ativo';
-$string['kialo_cmid'] = 'ID da atividade Kialo';
-$string['kialo_cmid_help'] = 'Opcional: informe o ID do módulo de curso de uma atividade Kialo existente para vincular este debate a ela.';
 
 // Rótulo do botão usado na página de debates quando uma atividade Kialo está vinculada a um debate.
 $string['participatedebate'] = 'Participar do debate';
 
+// Navigation labels for the sidebar.  Used to build the left navigation menu.
+$string['navhome'] = 'Página inicial';
+$string['navprofile'] = 'Perfil';
+$string['navdebates'] = 'Debates';
+$string['navadddebate'] = 'Adicionar debate';
+
+// Strings adicionais para a página de perfil.
+$string['editbanner'] = 'Editar capa';
+$string['editprofilepic'] = 'Editar foto de perfil';
+$string['friends'] = 'Amigos';
+$string['friendspending'] = 'Solicitações de amizade e conexões aparecerão aqui.';
+$string['posts'] = 'Postagens';
+
+// Textos da página de debates.
+$string['viewpost'] = 'Ver postagem';
+
+// Textos para a página de adição de debates.
+$string['debate_title'] = 'Título';
+$string['debate_description'] = 'Descrição';
+$string['debate_weekstart'] = 'Início da semana (timestamp)';
+$string['debate_postid'] = 'ID da postagem associada (opcional)';
+$string['debate_kialocmid'] = 'ID do módulo Kialo (opcional)';
+$string['debatecreated'] = 'Debate criado com sucesso';
+$string['err_title_required'] = 'Um título é obrigatório para o debate.';
+$string['err_weekstart_required'] = 'A data de início da semana é obrigatória.';
+$string['err_couldnotcreate'] = 'Não foi possível criar o debate. Tente novamente.';
+
+// Strings do sistema de amizade.
+$string['friendrequests'] = 'Solicitações de amizade';
+$string['addfriend'] = 'Adicionar amigo';
+$string['pendingfriend'] = 'Pendente';
+$string['acceptfriend'] = 'Aceitar';
+$string['alreadyfriends'] = 'Vocês são amigos';
+$string['nofriends'] = 'Nenhum amigo ainda.';
+$string['nofriendrequests'] = 'Nenhuma solicitação pendente.';
+$string['friendrequestsent'] = 'Solicitação de amizade enviada.';
+$string['friendrequestaccepted'] = 'Solicitação de amizade aceita.';
+$string['friendrequestcancelled'] = 'Solicitação de amizade cancelada.';
+$string['friendremoved'] = 'Amizade removida.';
+$string['friendrequesterror'] = 'Não foi possível processar a solicitação de amizade.';
+
+// Rótulos para cancelar e remover amizades.
+$string['cancelrequest'] = 'Cancelar solicitação';
+$string['removefriend'] = 'Remover amigo';

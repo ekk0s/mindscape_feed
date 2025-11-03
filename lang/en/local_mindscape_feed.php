@@ -39,26 +39,58 @@ $string['eventpostliked'] = 'Post liked in Mindscape feed';
 $string['postlikenotificationsubject'] = 'Your post was liked in the Mindscape feed';
 $string['postlikenotificationmessage'] = '{$a->liker} liked your post: "{$a->postcontent}".\nView: {$a->url}';
 $string['postlikenotificationmessagehtml'] = '<p><strong>{$a->liker}</strong> liked your post:</p><blockquote>{$a->postcontent}</blockquote><p>View <a href="{$a->url}">here</a>.</p>';
+
 $string['weeklydebates'] = 'Weekly debates';
 $string['viewdiscussion'] = 'View discussion';
 $string['nodebates'] = 'No active debates at the moment.';
 
 // Navigation link to the weekly debates page.
 $string['viewdebates'] = 'View weekly debates';
-// Management page strings.
-$string['managedebates'] = 'Manage weekly debates';
-$string['existingdebates'] = 'Existing debates';
-$string['adddebate'] = 'Add a new debate';
-$string['debatecreated'] = 'Debate created successfully';
-
-// Debate form field strings.
-$string['title'] = 'Title';
-$string['description'] = 'Description';
-$string['weekstart'] = 'Week start';
-$string['active'] = 'Active';
-$string['kialo_cmid'] = 'Kialo activity ID';
-$string['kialo_cmid_help'] = 'Optional: enter the course module ID of an existing Kialo activity to link this debate to it.';
 
 // Button label used on the debates page when a Kialo activity is linked to a debate.
 $string['participatedebate'] = 'Participate in debate';
 
+// Navigation labels for the sidebar.  Used to build the left navigation menu.
+$string['navhome'] = 'Home';
+$string['navprofile'] = 'Profile';
+$string['navdebates'] = 'Debates';
+$string['navadddebate'] = 'Add debate';
+
+// Additional strings for profile page.
+$string['editbanner'] = 'Edit cover';
+$string['editprofilepic'] = 'Edit profile picture';
+$string['friends'] = 'Friends';
+$string['friendspending'] = 'Friend requests and connections will appear here.';
+$string['posts'] = 'Posts';
+
+// Debate page strings.
+$string['viewpost'] = 'View post';
+
+// Strings for adding a debate.
+$string['debate_title'] = 'Title';
+$string['debate_description'] = 'Description';
+$string['debate_weekstart'] = 'Week start (timestamp)';
+$string['debate_postid'] = 'Associated post ID (optional)';
+$string['debate_kialocmid'] = 'Kialo course module ID (optional)';
+$string['debatecreated'] = 'Debate created successfully';
+$string['err_title_required'] = 'A title is required for the debate.';
+$string['err_weekstart_required'] = 'The week start date is required.';
+$string['err_couldnotcreate'] = 'Could not create the debate. Please try again.';
+
+// Friend system strings.
+$string['friendrequests'] = 'Friend requests';
+$string['addfriend'] = 'Add friend';
+$string['pendingfriend'] = 'Pending';
+$string['acceptfriend'] = 'Accept';
+$string['alreadyfriends'] = 'You are friends';
+$string['nofriends'] = 'No friends yet.';
+$string['nofriendrequests'] = 'No pending friend requests.';
+$string['friendrequestsent'] = 'Friend request sent.';
+$string['friendrequestaccepted'] = 'Friend request accepted.';
+$string['friendrequestcancelled'] = 'Friend request cancelled.';
+$string['friendremoved'] = 'Friend removed.';
+$string['friendrequesterror'] = 'Unable to process friend request.';
+
+// Labels for canceling and removing friendships.
+$string['cancelrequest'] = 'Cancel request';
+$string['removefriend'] = 'Remove friend';

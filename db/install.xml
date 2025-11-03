@@ -1,84 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/mindscape_feed/db" VERSION="2025092802" COMMENT="Mindscape feed">
-  <TABLES>
+<!--
+    This install XML defines additional database tables for the Mindscape Feed
+    plugin.  A new table is introduced to support the simple friends system
+    requested by the user.  Each record in the table represents a relationship
+    between two users and stores its status (pending or accepted).  The
+    combination of userid and friendid is unique to prevent duplicate entries.
 
-    <TABLE NAME="local_mindscape_posts" COMMENT="Feed posts">
-      <FIELDS>
-        <FIELD NAME="id"           TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="userid"       TYPE="int"  LENGTH="10" NOTNULL="true"/>
-        <FIELD NAME="content"      TYPE="text"              NOTNULL="true"/>
-        <FIELD NAME="timecreated"  TYPE="int"  LENGTH="10" NOTNULL="true"/>
-        <FIELD NAME="timemodified" TYPE="int"  LENGTH="10" NOTNULL="true"/>
-        <FIELD NAME="deleted"      TYPE="int"  LENGTH="1"  NOTNULL="true" DEFAULT="0"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
-        <INDEX NAME="timecreated_idx" UNIQUE="false" FIELDS="timecreated"/>
-      </INDEXES>
-    </TABLE>
-
-    <TABLE NAME="local_mindscape_comments" COMMENT="Feed comments">
-      <FIELDS>
-        <FIELD NAME="id"          TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="postid"      TYPE="int"  LENGTH="10" NOTNULL="true"/>
-        <FIELD NAME="userid"      TYPE="int"  LENGTH="10" NOTNULL="true"/>
-        <FIELD NAME="content"     TYPE="text"              NOTNULL="true"/>
-        <FIELD NAME="timecreated" TYPE="int"  LENGTH="10" NOTNULL="true"/>
-        <FIELD NAME="deleted"     TYPE="int"  LENGTH="1"  NOTNULL="true" DEFAULT="0"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="post_fk" TYPE="foreign" FIELDS="postid" REFTABLE="local_mindscape_posts" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="postid_idx" UNIQUE="false" FIELDS="postid"/>
-        <INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
-      </INDEXES>
-    </TABLE>
-
-    <!-- New table for tracking likes on feed posts -->
-    <TABLE NAME="local_mindscape_likes" COMMENT="Feed post likes">
-      <FIELDS>
-        <FIELD NAME="id"      TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="postid"  TYPE="int" LENGTH="10" NOTNULL="true"/>
-        <FIELD NAME="userid"  TYPE="int" LENGTH="10" NOTNULL="true"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="post_fk" TYPE="foreign" FIELDS="postid" REFTABLE="local_mindscape_posts" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="postid_idx" UNIQUE="false" FIELDS="postid"/>
-        <INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
-        <!-- Ensure that a user can only like a post once. -->
-        <INDEX NAME="unique_like" UNIQUE="true" FIELDS="postid,userid"/>
-      </INDEXES>
-    </TABLE>
-
-    <!-- Table for weekly debates. Each record defines a debate topic for a given
-         week. A debate may optionally be linked to an existing feed post
-         (postid) and/or a Kialo activity (kialo_cmid). When a Kialo course
-         module ID is provided the debates page will display a link to the
-         corresponding Kialo activity. -->
-    <TABLE NAME="local_mindscape_debates" COMMENT="Weekly debates">
-      <FIELDS>
-        <FIELD NAME="id"           TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="title"        TYPE="char" LENGTH="255" NOTNULL="true"/>
-        <FIELD NAME="description"  TYPE="text"              NOTNULL="false"/>
-        <FIELD NAME="postid"       TYPE="int"  LENGTH="10" NOTNULL="false"/>
-        <FIELD NAME="weekstart"    TYPE="int"  LENGTH="10" NOTNULL="true"/>
-        <FIELD NAME="active"       TYPE="int"  LENGTH="1"  NOTNULL="true" DEFAULT="0"/>
-        <FIELD NAME="timecreated"  TYPE="int"  LENGTH="10" NOTNULL="true"/>
-        <FIELD NAME="kialo_cmid"   TYPE="int"  LENGTH="10" NOTNULL="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-
-  </TABLES>
+    To install this table, place this file under the plugin's db/ directory.
+    The Moodle XMLDB engine will process it when the plugin is installed.
+-->
+<XMLDB PATH="local/mindscape_feed/db" VERSION="2025110100" COMMENT="Install tables for Mindscape Feed" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../lib/xmldb/xmldb.xsd">
+    <TABLES>
+        <TABLE NAME="local_mindscape_friends" COMMENT="Friend relationships for Mindscape Feed">
+            <FIELD NAME="id" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" SEQUENCE="true"/>
+            <FIELD NAME="userid" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" COMMENT="The user who initiated the friendship"/>
+            <FIELD NAME="friendid" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" COMMENT="The other user in the relationship"/>
+            <FIELD NAME="status" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="pending" COMMENT="pending or accepted"/>
+            <FIELD NAME="timecreated" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" DEFAULT="0" COMMENT="Unix timestamp of creation"/>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            <KEY NAME="user_friend_unique" TYPE="unique" FIELDS="userid, friendid"/>
+        </TABLE>
+    </TABLES>
 </XMLDB>

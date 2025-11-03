@@ -7,6 +7,12 @@ use renderable;
 use templatable;
 use renderer_base;
 
+/**
+ * Renderable class for the main feed page.  This version adds user navigation
+ * data and additional links (home, profile, debates) to support a side
+ * navigation bar similar to Facebook.  It also optionally includes a link
+ * for administrators to add new debates.
+ */
 class feed_page implements renderable, templatable {
     /** @var \context_system */
     protected $context;
@@ -66,10 +72,9 @@ class feed_page implements renderable, templatable {
                     'content' => format_text($comment->content, FORMAT_HTML, ['context' => $systemcontext, 'filter' => true]),
                     'time' => userdate($comment->timecreated),
                     'iscommentowner' => $iscommentowner,
-                    // ✅ Adiciona sesskey na URL de editar comentário (GET).
                     'commentediturl' => (new \moodle_url(
                         '/local/mindscape_feed/editcomment.php',
-                        ['id' => $comment->id, 'sesskey' => sesskey()] // <—
+                        ['id' => $comment->id, 'sesskey' => sesskey()]
                     ))->out(false),
                 ];
             }
@@ -92,26 +97,34 @@ class feed_page implements renderable, templatable {
                     'liked' => $likedbyuser,
                 ],
                 'comments' => $commentitems,
-
-                // ✅ Adiciona sesskey na URL de editar post (GET).
                 'editurl' => (new \moodle_url(
                     '/local/mindscape_feed/editpost.php',
-                    ['id' => $post->id, 'sesskey' => sesskey()] // <—
+                    ['id' => $post->id, 'sesskey' => sesskey()]
                 ))->out(false),
-
-                // Forms (POST). O hidden input com {{sesskey}} já cobre, mas pode deixar a query também.
                 'commentformaction' => (new \moodle_url(
                     '/local/mindscape_feed/comment.php',
-                    ['postid' => $post->id] // POST leva <input name="sesskey" ...>
+                    ['postid' => $post->id]
                 ))->out(false),
-
-                // Se seu delete usa POST com hidden sesskey, pode deixar sem na query.
-                // Se usa GET, inclua a sesskey aqui também:
                 'deleteformaction' => (new \moodle_url(
                     '/local/mindscape_feed/delete.php',
-                    ['sesskey' => sesskey()] // opcional, conforme sua implementação
+                    ['sesskey' => sesskey()]
                 ))->out(false),
             ];
+        }
+
+        // User navigation information: picture, name and profile link.
+        $userpic   = $output->user_picture($USER, ['size' => 50]);
+        $fullname  = fullname($USER);
+        $profileurl = (new \moodle_url('/local/mindscape_feed/profile.php', ['id' => $USER->id]))->out(false);
+        // Build navigation links. Always include home, profile and debates. If user can moderate,
+        // include an admin link to add new debates.
+        $navlinks = [
+            ['label' => get_string('navhome', 'local_mindscape_feed'), 'url' => (new \moodle_url('/local/mindscape_feed/index.php'))->out(false)],
+            ['label' => get_string('navprofile', 'local_mindscape_feed'), 'url' => $profileurl],
+            ['label' => get_string('navdebates', 'local_mindscape_feed'), 'url' => (new \moodle_url('/local/mindscape_feed/debates.php'))->out(false)],
+        ];
+        if ($canmoderate) {
+            $navlinks[] = ['label' => get_string('navadddebate', 'local_mindscape_feed'), 'url' => (new \moodle_url('/local/mindscape_feed/adddebate.php'))->out(false)];
         }
 
         return [
@@ -120,12 +133,15 @@ class feed_page implements renderable, templatable {
             'canmoderate' => $canmoderate,
             'posts' => $items,
             'postformaction' => (new \moodle_url('/local/mindscape_feed/post.php'))->out(false),
-            'sesskey' => sesskey(), // usado como <input type="hidden" name="sesskey" ...> nos forms
-            // URL to the weekly debates page. This allows the template to render
-            // a button linking directly to the debates listing without requiring users
-            // to manually type the URL. It is always included regardless of
-            // capabilities, so any logged-in user can navigate there.
+            'sesskey' => sesskey(),
             'debatesurl' => (new \moodle_url('/local/mindscape_feed/debates.php'))->out(false),
+            // New: user navigation block.  Mustache template will use these keys to render the sidebar.
+            'usernav' => [
+                'userpic' => $userpic,
+                'fullname' => $fullname,
+                'profileurl' => $profileurl,
+                'links' => $navlinks,
+            ],
         ];
     }
 }

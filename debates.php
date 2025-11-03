@@ -15,7 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Public page that renders the list of weekly debates.
+ * Debates listing page for the Mindscape Feed plugin.
+ *
+ * Presents a list of weekly debates, their descriptions and links back
+ * to associated posts or embedded Kialo activities.  The data is
+ * provided by the debates_page renderable class.
  *
  * @package    local_mindscape_feed
  * @copyright  2025 Your Name
@@ -29,13 +33,12 @@ require_login();
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/mindscape_feed/debates.php'));
-$strtitle = get_string('weeklydebates', 'local_mindscape_feed');
-$PAGE->set_title($strtitle);
-$PAGE->set_heading($strtitle);
+$PAGE->set_title(get_string('weeklydebates', 'local_mindscape_feed'));
+$PAGE->set_heading(get_string('weeklydebates', 'local_mindscape_feed'));
 $PAGE->set_pagelayout('standard');
 
-$debatespage = new \local_mindscape_feed\output\debates_page();
+$page = new local_mindscape_feed\output\debates_page();
 
 echo $OUTPUT->header();
-echo $OUTPUT->render_from_template('local_mindscape_feed/debates', $debatespage->export_for_template($OUTPUT));
+echo $OUTPUT->render_from_template('local_mindscape_feed/debates', $page->export_for_template($OUTPUT));
 echo $OUTPUT->footer();
