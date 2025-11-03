@@ -90,6 +90,14 @@ $string['err_title_required'] = 'Um título é obrigatório para o debate.';
 $string['err_weekstart_required'] = 'A data de início da semana é obrigatória.';
 $string['err_couldnotcreate'] = 'Não foi possível criar o debate. Tente novamente.';
 
+// Erro quando o ID do módulo Kialo não corresponde a uma atividade Kialo válida.
+$string['err_invalid_kialocmid'] = 'O ID do módulo Kialo informado é inválido.';
+
+// Rótulo da caixa de seleção no formulário de adição de debates. Quando marcada,
+// cria automaticamente uma atividade Kialo oculta em um curso dedicado em vez de
+// exigir um ID de módulo.  Recomenda-se deixar marcada para simplificar.
+$string['autocreatekialo'] = 'Criar automaticamente uma atividade Kialo (recomendado)';
+
 // Strings do sistema de amizade.
 $string['friendrequests'] = 'Solicitações de amizade';
 $string['addfriend'] = 'Adicionar amigo';

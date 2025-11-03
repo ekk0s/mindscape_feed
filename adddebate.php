@@ -50,6 +50,9 @@ if (data_submitted() && confirm_sesskey()) {
     $weekstart = required_param('weekstart', PARAM_INT);
     $postid = optional_param('postid', 0, PARAM_INT);
     $kialocmid = optional_param('kialocmid', 0, PARAM_INT);
+    // Allow moderators to auto-create a Kialo activity.  When set, the helper
+    // class will create a hidden course and activity and return its cmid.
+    $autocreatekialo = optional_param('autocreatekialo', 0, PARAM_BOOL);
 
     // Basic validation: title and weekstart must be provided.
     if (empty($title)) {
@@ -57,6 +60,34 @@ if (data_submitted() && confirm_sesskey()) {
     }
     if (empty($weekstart)) {
         $errors[] = get_string('err_weekstart_required', 'local_mindscape_feed');
+    }
+
+    // If the moderator has opted to auto-create the Kialo activity, override
+    // the provided course module id by creating a new activity via the helper.
+    if ($autocreatekialo) {
+        // Require the helper class only if needed.
+        require_once($CFG->dirroot . '/local/mindscape_feed/classes/local/kialo_helper.php');
+        try {
+            // Create a new hidden Kialo activity using the debate title and description.
+            $kialocmid = \local_mindscape_feed\local\kialo_helper::ensure_cmid_for_debate($title, $description);
+        } catch (Throwable $e) {
+            // Append a generic error message; do not expose internal exception details.
+            $errors[] = get_string('err_couldnotcreate', 'local_mindscape_feed');
+        }
+    } else {
+        // If not auto-creating, validate Kialo CMID if provided.  Ensure that a mod_kialo course module exists with this id.
+        if (!empty($kialocmid)) {
+            // Only proceed if the mod_kialo plugin is installed and the module exists.  Use IGNORE_MISSING to suppress exceptions.
+            $cmrecord = false;
+            try {
+                $cmrecord = get_coursemodule_from_id('kialo', $kialocmid, 0, false, IGNORE_MISSING);
+            } catch (Throwable $e) {
+                $cmrecord = false;
+            }
+            if (!$cmrecord) {
+                $errors[] = get_string('err_invalid_kialocmid', 'local_mindscape_feed');
+            }
+        }
     }
 
     if (empty($errors)) {
@@ -122,6 +153,20 @@ echo html_writer::end_div();
 echo html_writer::start_div('mb-3');
 echo html_writer::tag('label', get_string('debate_kialocmid', 'local_mindscape_feed'), ['for' => 'kialocmid']);
 echo html_writer::empty_tag('input', ['type' => 'number', 'class' => 'form-control', 'name' => 'kialocmid', 'id' => 'kialocmid', 'value' => optional_param('kialocmid', '', PARAM_INT)]);
+echo html_writer::end_div();
+
+// Checkbox to automatically create a Kialo activity in a hidden course.
+echo html_writer::start_div('form-check mb-3');
+// The checkbox is checked by default to encourage automatic creation of Kialo activities.
+echo html_writer::empty_tag('input', [
+    'type' => 'checkbox',
+    'class' => 'form-check-input',
+    'name' => 'autocreatekialo',
+    'id' => 'autocreatekialo',
+    'value' => 1,
+    'checked' => (optional_param('autocreatekialo', 1, PARAM_BOOL)) ? 'checked' : null
+]);
+echo html_writer::tag('label', get_string('autocreatekialo', 'local_mindscape_feed'), ['for' => 'autocreatekialo', 'class' => 'form-check-label']);
 echo html_writer::end_div();
 
 // Submit button.

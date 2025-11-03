@@ -32,9 +32,36 @@ require(__DIR__ . '/../../config.php');
 $cmid = required_param('id', PARAM_INT);
 
 // Fetch the course module, course and instance records for this Kialo activity.
-$cm = get_coursemodule_from_id('kialo', $cmid, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
-$kialo = $DB->get_record('kialo', ['id' => $cm->instance], '*', MUST_EXIST);
+// Attempt to fetch the course module, course and Kialo instance records.  If any of these
+// cannot be found, redirect back to the debates page with a user-friendly error.  We
+// suppress exceptions to avoid exposing technical messages to users.
+try {
+    $cm = get_coursemodule_from_id('kialo', $cmid, 0, false, MUST_EXIST);
+} catch (Throwable $e) {
+    // If the module doesn't exist or Kialo is not installed, redirect with an error.
+    redirect(new moodle_url('/local/mindscape_feed/debates.php'), get_string('err_invalid_kialocmid', 'local_mindscape_feed'), 3);
+    // Terminate to satisfy static analysis, though redirect() exits.
+    die;
+}
+$course = $DB->get_record('course', ['id' => $cm->course], '*', IGNORE_MISSING);
+if (!$course) {
+    redirect(new moodle_url('/local/mindscape_feed/debates.php'), get_string('err_invalid_kialocmid', 'local_mindscape_feed'), 3);
+    die;
+}
+$kialo = $DB->get_record('kialo', ['id' => $cm->instance], '*', IGNORE_MISSING);
+if (!$kialo) {
+    redirect(new moodle_url('/local/mindscape_feed/debates.php'), get_string('err_invalid_kialocmid', 'local_mindscape_feed'), 3);
+    die;
+}
+
+// Before enforcing login, ensure the current user is enrolled in the container course
+// when the Kialo activity was automatically created.  This allows users who are
+// not otherwise enrolled in the course to access the activity.  If enrolment
+// fails or the helper is unavailable, require_login will still handle access
+// control.
+require_once($CFG->dirroot . '/local/mindscape_feed/classes/local/kialo_helper.php');
+// $USER is a global representing the current user; enrol them if needed.
+\local_mindscape_feed\local\kialo_helper::enrol_user_if_needed($course->id, $USER->id);
 
 // Enforce login and capability checks.
 require_login($course, false, $cm);

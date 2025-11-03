@@ -81,6 +81,13 @@ $string['err_title_required'] = 'A title is required for the debate.';
 $string['err_weekstart_required'] = 'The week start date is required.';
 $string['err_couldnotcreate'] = 'Could not create the debate. Please try again.';
 
+// Error when Kialo course module id does not correspond to a Kialo activity.
+$string['err_invalid_kialocmid'] = 'The specified Kialo module ID is invalid.';
+
+// Label for the checkbox used on the add debate form to automatically create
+// a Kialo activity in a hidden course instead of entering a course module ID.
+$string['autocreatekialo'] = 'Automatically create a Kialo activity (recommended)';
+
 // Friend system strings.
 $string['friendrequests'] = 'Friend requests';
 $string['addfriend'] = 'Add friend';
