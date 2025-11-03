@@ -53,10 +53,16 @@ class feed_page implements renderable, templatable {
                     $file->get_filepath(),
                     $file->get_filename()
                 );
-                $attachments[] = [
-                    'url' => $fileurl->out(false),
-                    'filename' => $file->get_filename(),
-                ];
+            // Determine if the attachment is an image.  Some Moodle file types may not
+            // return a standard image MIME type, so fall back to the file extension.
+            $filename = $file->get_filename();
+            $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            $isimage = preg_match('/^image\//', $file->get_mimetype()) || in_array($extension, ['jpg','jpeg','png','gif','bmp','webp']);
+            $attachments[] = [
+                'url' => $fileurl->out(false),
+                'filename' => $filename,
+                'isimage' => $isimage,
+            ];
             }
 
             // Comments.
@@ -79,9 +85,18 @@ class feed_page implements renderable, templatable {
                 ];
             }
 
-            // Likes.
+            // Likes.  Count the number of likes and whether the current user has liked this post.
             $likescount = $DB->count_records('local_mindscape_likes', ['postid' => $post->id]);
             $likedbyuser = $DB->record_exists('local_mindscape_likes', ['postid' => $post->id, 'userid' => $USER->id]);
+            // Dislikes.  Use separate table for dislikes.
+            // If the table does not exist (e.g., plugin not upgraded yet), counts will be zero.
+            $dislikescount = 0;
+            $dislikedbyuser = false;
+            $dbman = $DB->get_manager();
+            if ($dbman->table_exists('local_mindscape_dislikes')) {
+                $dislikescount = $DB->count_records('local_mindscape_dislikes', ['postid' => $post->id]);
+                $dislikedbyuser = $DB->record_exists('local_mindscape_dislikes', ['postid' => $post->id, 'userid' => $USER->id]);
+            }
 
             $items[] = [
                 'id' => $post->id,
@@ -96,6 +111,10 @@ class feed_page implements renderable, templatable {
                     'count' => $likescount,
                     'liked' => $likedbyuser,
                 ],
+                'dislikes' => [
+                    'count' => $dislikescount,
+                    'disliked' => $dislikedbyuser,
+                ],
                 'comments' => $commentitems,
                 'editurl' => (new \moodle_url(
                     '/local/mindscape_feed/editpost.php',
@@ -109,6 +128,9 @@ class feed_page implements renderable, templatable {
                     '/local/mindscape_feed/delete.php',
                     ['sesskey' => sesskey()]
                 ))->out(false),
+                // Form actions for likes and dislikes.  Include the base URL only; returnurl is added by the script.
+                'likeformaction' => (new \moodle_url('/local/mindscape_feed/like.php'))->out(false),
+                'dislikeformaction' => (new \moodle_url('/local/mindscape_feed/dislike.php'))->out(false),
             ];
         }
 

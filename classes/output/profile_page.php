@@ -140,14 +140,26 @@ class profile_page implements renderable, templatable {
                     $file->get_filepath(),
                     $file->get_filename()
                 );
+                $filename = $file->get_filename();
+                $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                $isimage = preg_match('/^image\//', $file->get_mimetype()) || in_array($extension, ['jpg','jpeg','png','gif','bmp','webp']);
                 $attachments[] = [
                     'url' => $fileurl->out(false),
-                    'filename' => $file->get_filename(),
+                    'filename' => $filename,
+                    'isimage' => $isimage,
                 ];
             }
             // Likes.
             $likescount = $DB->count_records('local_mindscape_likes', ['postid' => $post->id]);
             $likedbyuser = $DB->record_exists('local_mindscape_likes', ['postid' => $post->id, 'userid' => $USER->id]);
+            // Dislikes (optional).  Check if the dislikes table exists.
+            $dislikescount = 0;
+            $dislikedbyuser = false;
+            $dbman = $DB->get_manager();
+            if ($dbman->table_exists('local_mindscape_dislikes')) {
+                $dislikescount = $DB->count_records('local_mindscape_dislikes', ['postid' => $post->id]);
+                $dislikedbyuser = $DB->record_exists('local_mindscape_dislikes', ['postid' => $post->id, 'userid' => $USER->id]);
+            }
 
             // Comments for each post (limit to 10 for performance).
             $comments = $DB->get_records_select('local_mindscape_comments', 'deleted = 0 AND postid = ?', [$post->id], 'timecreated ASC', '*', 0, 10);
@@ -180,6 +192,10 @@ class profile_page implements renderable, templatable {
                     'count' => $likescount,
                     'liked' => $likedbyuser,
                 ],
+                'dislikes' => [
+                    'count' => $dislikescount,
+                    'disliked' => $dislikedbyuser,
+                ],
                 'comments' => $commentitems,
                 'editurl' => (new \moodle_url(
                     '/local/mindscape_feed/editpost.php',
@@ -193,6 +209,9 @@ class profile_page implements renderable, templatable {
                     '/local/mindscape_feed/delete.php',
                     ['sesskey' => sesskey()]
                 ))->out(false),
+                // Actions for like and dislike forms.  See like.php and dislike.php.
+                'likeformaction' => (new \moodle_url('/local/mindscape_feed/like.php'))->out(false),
+                'dislikeformaction' => (new \moodle_url('/local/mindscape_feed/dislike.php'))->out(false),
             ];
         }
 

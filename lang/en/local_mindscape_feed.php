@@ -26,6 +26,10 @@ $string['save'] = 'Save';
 $string['like'] = 'Like';
 $string['unlike'] = 'Unlike';
 
+// Dislike actions.
+$string['dislike'] = 'Dislike';
+$string['undislike'] = 'Remove dislike';
+
 // Tooltip for attachment button.
 $string['attachfile'] = 'Attach file';
 
@@ -90,6 +94,10 @@ $string['friendrequestaccepted'] = 'Friend request accepted.';
 $string['friendrequestcancelled'] = 'Friend request cancelled.';
 $string['friendremoved'] = 'Friend removed.';
 $string['friendrequesterror'] = 'Unable to process friend request.';
+
+// Error messages used when handling likes/dislikes.
+$string['invalidpostid'] = 'Invalid post ID.';
+$string['invalidaction'] = 'Invalid action.';
 
 // Labels for canceling and removing friendships.
 $string['cancelrequest'] = 'Cancel request';

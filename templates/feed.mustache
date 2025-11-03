@@ -34,8 +34,10 @@
           <div class="mb-3 d-flex align-items-center">
             <input id="mindscape-attach-input" type="file" name="attachments[]" multiple class="d-none">
             <label for="mindscape-attach-input" class="btn btn-outline-secondary btn-sm me-2" title="{{#str}}attachfile, local_mindscape_feed{{/str}}">
-              <i class="fa fa-paperclip"></i>
+              &#128206;
             </label>
+            <!-- Attachment label shows the selected file names or number of files. -->
+            <span id="mindscape-attach-label" class="text-muted small me-2"></span>
             <input type="hidden" name="sesskey" value="{{sesskey}}">
             <button type="submit" class="btn btn-primary btn-sm">{{#str}}publish, local_mindscape_feed{{/str}}</button>
           </div>
@@ -51,40 +53,68 @@
             {{{userpic}}}
             <strong>{{fullname}}</strong>
             <span class="text-muted ms-auto">{{time}}</span>
+            <!-- Three-dot menu for owner or moderator actions (edit/delete).  Placed in header for compactness. -->
+            <div class="dropdown ms-2">
+              <button class="btn btn-sm btn-link text-muted p-0" type="button" id="post{{id}}dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                &#x22EE;
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="post{{id}}dropdown">
+                <!-- Edit action shown for post owners and moderators. -->
+                {{#isowner}}
+                  <li><a class="dropdown-item" href="{{editurl}}">{{#str}}edit, local_mindscape_feed{{/str}}</a></li>
+                {{/isowner}}
+                {{^isowner}}{{#canmoderate}}
+                  <li><a class="dropdown-item" href="{{editurl}}">{{#str}}edit, local_mindscape_feed{{/str}}</a></li>
+                {{/canmoderate}}{{/isowner}}
+                <!-- Delete action shown only to moderators.  Use a form to send POST request. -->
+                {{#canmoderate}}
+                  <li>
+                    <form method="post" action="{{{deleteformaction}}}" onsubmit="return confirm('{{#str}}confirmdelete, local_mindscape_feed{{/str}}');">
+                      <input type="hidden" name="postid" value="{{id}}">
+                      <input type="hidden" name="sesskey" value="{{sesskey}}">
+                      <button type="submit" class="dropdown-item text-danger">{{#str}}delete, local_mindscape_feed{{/str}}</button>
+                    </form>
+                  </li>
+                {{/canmoderate}}
+              </ul>
+            </div>
           </header>
           <div class="feed-content mb-2">{{{content}}}</div>
           {{#attachments}}
-            <div class="attachment mb-1">
-              <a href="{{{url}}}" target="_blank">{{filename}}</a>
+            <div class="attachment mb-2">
+              {{#isimage}}
+                <img src="{{{url}}}" alt="{{filename}}" class="img-fluid rounded">
+              {{/isimage}}
+              {{^isimage}}
+                <a href="{{{url}}}" target="_blank">{{filename}}</a>
+              {{/isimage}}
             </div>
           {{/attachments}}
-          {{#attachments}}{{/attachments}}
-          <form class="d-inline me-2 mindscape-like-form" data-liked="{{likes.liked}}" data-postid="{{id}}" method="post" action="/local/mindscape_feed/like.php">
-            <input type="hidden" name="postid" value="{{id}}">
-            <input type="hidden" name="sesskey" value="{{sesskey}}">
-            {{#likes.liked}}
-              <button type="submit" name="action" value="unlike" class="btn btn-sm btn-secondary">{{#str}}unlike, local_mindscape_feed{{/str}}</button>
-            {{/likes.liked}}
-            {{^likes.liked}}
-              <button type="submit" name="action" value="like" class="btn btn-sm btn-outline-secondary">{{#str}}like, local_mindscape_feed{{/str}}</button>
-            {{/likes.liked}}
-            <span class="ms-1 mindscape-like-count">{{likes.count}}</span>
-          </form>
-          {{#isowner}}
-            <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
-          {{/isowner}}
-          {{^isowner}}
-            {{#canmoderate}}
-              <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
-            {{/canmoderate}}
-          {{/isowner}}
-          {{#canmoderate}}
-          <form method="post" action="{{{deleteformaction}}}" class="d-inline" onsubmit="return confirm('{{#str}}confirmdelete, local_mindscape_feed{{/str}}');">
-            <input type="hidden" name="postid" value="{{id}}">
-            <input type="hidden" name="sesskey" value="{{sesskey}}">
-            <button class="btn btn-sm btn-outline-danger">{{#str}}delete, local_mindscape_feed{{/str}}</button>
-          </form>
-          {{/canmoderate}}
+          <!-- Reaction buttons: like and dislike with counts.  Use Unicode icons for simplicity. -->
+          <div class="d-flex align-items-center mb-2">
+            <form class="d-inline me-1" method="post" action="{{likeformaction}}">
+              <input type="hidden" name="postid" value="{{id}}">
+              <input type="hidden" name="sesskey" value="{{sesskey}}">
+              {{#likes.liked}}
+                <button type="submit" name="action" value="unlike" class="btn btn-sm btn-link p-0 text-primary" title="{{#str}}unlike, local_mindscape_feed{{/str}}">👍</button>
+              {{/likes.liked}}
+              {{^likes.liked}}
+                <button type="submit" name="action" value="like" class="btn btn-sm btn-link p-0" title="{{#str}}like, local_mindscape_feed{{/str}}">👍</button>
+              {{/likes.liked}}
+            </form>
+            <span class="me-2 small">{{likes.count}}</span>
+            <form class="d-inline me-1" method="post" action="{{dislikeformaction}}">
+              <input type="hidden" name="postid" value="{{id}}">
+              <input type="hidden" name="sesskey" value="{{sesskey}}">
+              {{#dislikes.disliked}}
+                <button type="submit" name="action" value="undislike" class="btn btn-sm btn-link p-0 text-danger" title="{{#str}}undislike, local_mindscape_feed{{/str}}">👎</button>
+              {{/dislikes.disliked}}
+              {{^dislikes.disliked}}
+                <button type="submit" name="action" value="dislike" class="btn btn-sm btn-link p-0" title="{{#str}}dislike, local_mindscape_feed{{/str}}">👎</button>
+              {{/dislikes.disliked}}
+            </form>
+            <span class="me-2 small">{{dislikes.count}}</span>
+          </div>
           <section class="comments mt-3">
             {{#comments}}
             <div class="d-flex align-items-start gap-2 mb-2">
@@ -126,3 +156,24 @@
     </div>
   </div>
 </div>
+
+<!-- Inline script to update the attachment label when files are selected. -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var input = document.getElementById('mindscape-attach-input');
+  var label = document.getElementById('mindscape-attach-label');
+  if (input && label) {
+    input.addEventListener('change', function() {
+      if (this.files && this.files.length > 0) {
+        if (this.files.length === 1) {
+          label.textContent = this.files[0].name;
+        } else {
+          label.textContent = this.files.length + ' arquivos anexados';
+        }
+      } else {
+        label.textContent = '';
+      }
+    });
+  }
+});
+</script>

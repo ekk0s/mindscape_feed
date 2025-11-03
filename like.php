@@ -1,90 +1,63 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file processes like and unlike actions for Mindscape Feed posts.
 //
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+// It accepts POST requests with the parameters:
+// - postid: integer ID of the post being liked or unliked
+// - action: 'like' to like a post, 'unlike' to remove the like
+// - sesskey: standard Moodle session key for CSRF protection
 //
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// After processing, the script redirects back to the referring page.  It
+// does not output any HTML.  AJAX usage is not implemented in this
+// simple version; the page must be refreshed to reflect updated counts.
 
-/**
- * Like/unlike handler for the Mindscape feed.
- *
- * This script processes requests to like or unlike a feed post.  It requires a valid
- * sesskey and a logged-in user. If the post exists and the user has not yet liked it,
- * a like record is inserted. If the action is unlike, any existing like record for
- * that user and post is removed. After processing, the user is redirected back to
- * the feed anchored to the relevant post.
- *
- * @package   local_mindscape_feed
- * @copyright 2025 Mindscape
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-require_once(__DIR__ . '/../../config.php');
+require(__DIR__ . '/../../config.php');
 
 require_login();
+
+// Only accept POST requests.
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    print_error('invalidaccess');
+}
+
+// Validate session key.
 require_sesskey();
 
-// Parameters: postid and action (like or unlike).
 $postid = required_param('postid', PARAM_INT);
-$action = required_param('action', PARAM_ALPHANUMEXT);
+$action = required_param('action', PARAM_ALPHA);
 
 $context = context_system::instance();
 
-// Ensure the post exists and is not deleted.
-$postexists = $DB->record_exists('local_mindscape_posts', ['id' => $postid, 'deleted' => 0]);
-if ($postexists) {
-    if ($action === 'like') {
-        // Only add a like if one doesn't already exist for this user and post.
-        $exists = $DB->record_exists('local_mindscape_likes', ['postid' => $postid, 'userid' => $USER->id]);
-        if (!$exists) {
-            $record = (object) [
-                'postid'      => $postid,
-                'userid'      => $USER->id,
-                'timecreated' => time(),
-            ];
-            // Insert the record and capture the ID for event purposes.
-            $likeid = $DB->insert_record('local_mindscape_likes', $record, true);
-            // Trigger the like event so observers can send notifications.
-            $eventparams = [
-                'objectid' => $likeid,
-                'context'  => $context,
-                'userid'   => $USER->id,
-                'other'    => [
-                    'postid' => $postid,
-                ],
-            ];
-            $event = \local_mindscape_feed\event\post_liked::create($eventparams);
-            $event->trigger();
-        }
-    } else if ($action === 'unlike') {
-        // Remove any like record for this user on this post.
-        $DB->delete_records('local_mindscape_likes', ['postid' => $postid, 'userid' => $USER->id]);
+// Users need the capability to view the feed to like/unlike posts.  Use
+// the existing view capability rather than introducing a separate one.
+require_capability('local/mindscape_feed:view', $context);
+
+global $DB, $USER;
+
+// Ensure the post exists.
+if (!$DB->record_exists('local_mindscape_posts', ['id' => $postid, 'deleted' => 0])) {
+    print_error('invalidpostid', 'local_mindscape_feed');
+}
+
+// Process like/unlike.
+if ($action === 'like') {
+    // Only insert a like if one does not already exist.
+    if (!$DB->record_exists('local_mindscape_likes', ['postid' => $postid, 'userid' => $USER->id])) {
+        $record = new stdClass();
+        $record->postid = $postid;
+        $record->userid = $USER->id;
+        $record->timecreated = time();
+        $DB->insert_record('local_mindscape_likes', $record);
     }
+} else if ($action === 'unlike') {
+    // Remove the like if it exists.
+    $DB->delete_records('local_mindscape_likes', ['postid' => $postid, 'userid' => $USER->id]);
+} else {
+    print_error('invalidaction', 'local_mindscape_feed');
 }
 
-// Redirect back to the feed anchored to the post.
-// If this is an AJAX request (identified by the 'ajax' parameter), return JSON instead of redirecting.
-if (optional_param('ajax', 0, PARAM_BOOL)) {
-    // Calculate the latest like count and like status after processing.
-    $likescount = $DB->count_records('local_mindscape_likes', ['postid' => $postid]);
-    $likedstate = $DB->record_exists('local_mindscape_likes', ['postid' => $postid, 'userid' => $USER->id]);
-    // Set JSON header and output the response.
-    header('Content-Type: application/json');
-    echo json_encode([
-        'success' => true,
-        'count'   => (int) $likescount,
-        'liked'   => (bool) $likedstate,
-    ]);
-    exit;
+// Redirect back to the referring page.  Fallback to the feed if HTTP_REFERER is not set.
+$returnurl = optional_param('returnurl', null, PARAM_LOCALURL);
+if (!$returnurl) {
+    $returnurl = (new moodle_url('/local/mindscape_feed/index.php'))->out(false);
 }
-
-redirect(new moodle_url('/local/mindscape_feed/index.php', ['#' => 'p' . $postid]));
+redirect($returnurl);

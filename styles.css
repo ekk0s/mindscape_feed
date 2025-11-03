@@ -122,6 +122,15 @@ body {
     color: #fff;
 }
 
+/* Remove default underline from link-style buttons used for reaction icons and menus. */
+.btn-link {
+    text-decoration: none;
+}
+.btn-link:hover,
+.btn-link:focus {
+    text-decoration: none;
+}
+
 /* Comment section.  A thin top border distinguishes the comments
  * area from the post body.  Add spacing above the first comment.
  */

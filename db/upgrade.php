@@ -15,100 +15,45 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Upgrade steps for the Mindscape Feed plugin.
+ * Upgrade script for the Mindscape Feed plugin.
  *
- * This file defines the incremental steps that need to be executed
- * when upgrading from earlier versions of the plugin. Each step
- * checks the current installed version ($oldversion) and performs
- * database changes where necessary. This ensures that installations
- * that started on an older version can be safely upgraded when new
- * database tables or fields are introduced.
+ * This function is executed when the plugin version number is bumped in
+ * version.php.  It performs incremental database schema changes to
+ * ensure that new tables or fields are created when upgrading from
+ * previous versions.
  *
- * @package    local_mindscape_feed
- * @copyright  2025 Your Name
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @param int $oldversion the version we are upgrading from
+ * @return bool success
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Execute all the upgrade steps for the Mindscape Feed plugin.
- *
- * @param int $oldversion The version we are upgrading from.
- * @return bool Returns true on success.
- */
-function xmldb_local_mindscape_feed_upgrade(int $oldversion): bool {
+function xmldb_local_mindscape_feed_upgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager();
 
-    // During earlier releases (prior to 2025092805), the likes table did not exist.
-    // Ensure it is created on upgrade. We also add a unique index to prevent
-    // duplicate likes by the same user on the same post.
-    if ($oldversion < 2025092805) {
-        // Define table local_mindscape_likes to be created.
-        $table = new xmldb_table('local_mindscape_likes');
+    // Add the dislikes table in version 2025110300.  Prior to this
+    // release, only likes were stored.  The new table mirrors the
+    // structure of local_mindscape_likes but stores dislikes instead.
+    if ($oldversion < 2025110300) {
+        // Define table local_mindscape_dislikes to be created.
+        $table = new xmldb_table('local_mindscape_dislikes');
 
-        // Define fields for the table.
+        // Adding fields to table local_mindscape_dislikes.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('postid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
 
-        // Define keys. Primary key and foreign keys for post and user.
+        // Adding keys to table local_mindscape_dislikes.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table->add_key('postid_fk', XMLDB_KEY_FOREIGN, ['postid'], 'local_mindscape_posts', ['id']);
-        $table->add_key('userid_fk', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_key('post_user_unique', XMLDB_KEY_UNIQUE, ['postid', 'userid']);
 
-        // Define unique index to prevent duplicate likes.
-        $table->add_index('unique_like', XMLDB_INDEX_UNIQUE, ['postid', 'userid']);
-
-        // Conditionally create the table if it does not exist.
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
-        }
-    }
-
-    if ($oldversion < 2025092812) {
-        // Define table local_mindscape_debates to be created.
-        $table = new xmldb_table('local_mindscape_debates');
-
-        // Define fields for the debates table.
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
-        $table->add_field('postid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-        $table->add_field('weekstart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('active', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-
-        // Define keys for the debates table.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-
-        // Create the table if it does not already exist.
+        // Conditionally launch create table if it does not exist.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
-        upgrade_plugin_savepoint(true, 2025092812, 'local', 'mindscape_feed');
-    }
-
-    // Add a field to link a debate to a Kialo course module. This field is
-    // optional and will be used when a debate is represented by an activity
-    // created via the mod_kialo plugin. If the field is null, the debate
-    // falls back to a regular feed discussion only. We use a simple integer
-    // field pointing at the course_modules.id of the Kialo activity.
-    if ($oldversion < 2025101400) {
-        $table = new xmldb_table('local_mindscape_debates');
-        $field = new xmldb_field('kialo_cmid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-
-        // Only add the field if it does not already exist.
-        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Record the upgrade savepoint.
-        upgrade_plugin_savepoint(true, 2025101400, 'local', 'mindscape_feed');
+        // Mindscape Feed savepoint reached.
+        upgrade_plugin_savepoint(true, 2025110300, 'local', 'mindscape_feed');
     }
 
     return true;

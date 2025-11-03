@@ -9,8 +9,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mindscape_feed';
 // Version format YYYYMMDDRR where RR is the release number on that day.
-$plugin->version   = 2025110100;
-$plugin->release   = '2025-11-01 (friends system)';
+$plugin->version   = 2025110300;
+$plugin->release   = '2025-11-03 (minimal feed & dislikes)';
 // Require a relatively modern Moodle (3.4) for proper API support.
 $plugin->requires  = 2017111300;
 $plugin->maturity  = MATURITY_ALPHA;

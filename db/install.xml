@@ -20,5 +20,18 @@
             <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
             <KEY NAME="user_friend_unique" TYPE="unique" FIELDS="userid, friendid"/>
         </TABLE>
+        <!-- Table to store dislikes on posts.  Each record represents a single
+             dislike from a user on a post.  The combination of postid and
+             userid is unique to ensure a user can only dislike a post once.
+             If you remove dislikes on an upgrade, the table can be safely
+             dropped and recreated. -->
+        <TABLE NAME="local_mindscape_dislikes" COMMENT="Dislikes for posts in Mindscape Feed">
+            <FIELD NAME="id" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" SEQUENCE="true"/>
+            <FIELD NAME="postid" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" COMMENT="ID of the post that was disliked"/>
+            <FIELD NAME="userid" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" COMMENT="ID of the user who disliked the post"/>
+            <FIELD NAME="timecreated" TYPE="int" LENGTH="10" UNSIGNED="true" NOTNULL="true" DEFAULT="0" COMMENT="Timestamp when the dislike was created"/>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            <KEY NAME="post_user_unique" TYPE="unique" FIELDS="postid, userid"/>
+        </TABLE>
     </TABLES>
 </XMLDB>

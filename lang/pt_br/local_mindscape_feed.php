@@ -26,6 +26,10 @@ $string['save'] = 'Salvar';
 $string['like'] = 'Curtir';
 $string['unlike'] = 'Descurtir';
 
+// Ações de dislike.
+$string['dislike'] = 'Não curtir';
+$string['undislike'] = 'Remover não curtida';
+
 // Tooltip for attachment button.
 $string['attachfile'] = 'Anexar arquivo';
 
@@ -99,6 +103,10 @@ $string['friendrequestaccepted'] = 'Solicitação de amizade aceita.';
 $string['friendrequestcancelled'] = 'Solicitação de amizade cancelada.';
 $string['friendremoved'] = 'Amizade removida.';
 $string['friendrequesterror'] = 'Não foi possível processar a solicitação de amizade.';
+
+// Mensagens de erro para likes/dislikes.
+$string['invalidpostid'] = 'ID da postagem inválido.';
+$string['invalidaction'] = 'Ação inválida.';
 
 // Rótulos para cancelar e remover amizades.
 $string['cancelrequest'] = 'Cancelar solicitação';

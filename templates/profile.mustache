@@ -94,36 +94,66 @@
           {{{userpic}}}
           <strong>{{fullname}}</strong>
           <span class="text-muted ms-auto">{{time}}</span>
+          <!-- Three-dot menu for owner or moderator actions in profile posts -->
+          <div class="dropdown ms-2">
+            <button class="btn btn-sm btn-link text-muted p-0" type="button" id="profilepost{{id}}dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              &#x22EE;
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profilepost{{id}}dropdown">
+              {{#isowner}}
+                <li><a class="dropdown-item" href="{{editurl}}">{{#str}}edit, local_mindscape_feed{{/str}}</a></li>
+              {{/isowner}}
+              {{^isowner}}{{#canmoderate}}
+                <li><a class="dropdown-item" href="{{editurl}}">{{#str}}edit, local_mindscape_feed{{/str}}</a></li>
+              {{/canmoderate}}{{/isowner}}
+              {{#canmoderate}}
+                <li>
+                  <form method="post" action="{{{deleteformaction}}}" onsubmit="return confirm('{{#str}}confirmdelete, local_mindscape_feed{{/str}}');">
+                    <input type="hidden" name="postid" value="{{id}}">
+                    <input type="hidden" name="sesskey" value="{{../../sesskey}}">
+                    <button type="submit" class="dropdown-item text-danger">{{#str}}delete, local_mindscape_feed{{/str}}</button>
+                  </form>
+                </li>
+              {{/canmoderate}}
+            </ul>
+          </div>
         </header>
         <div class="mb-2">{{{content}}}</div>
         {{#attachments}}
-        <div class="attachment mb-1">
-          <a href="{{{url}}}" target="_blank">{{filename}}</a>
+        <div class="attachment mb-2">
+          {{#isimage}}
+            <img src="{{{url}}}" alt="{{filename}}" class="img-fluid rounded">
+          {{/isimage}}
+          {{^isimage}}
+            <a href="{{{url}}}" target="_blank">{{filename}}</a>
+          {{/isimage}}
         </div>
         {{/attachments}}
-        {{#attachments}}{{/attachments}}
-        <form class="d-inline me-2 mindscape-like-form" data-liked="{{likes.liked}}" data-postid="{{id}}" method="post" action="/local/mindscape_feed/like.php">
-          <input type="hidden" name="postid" value="{{id}}">
-          <input type="hidden" name="sesskey" value="{{../../sesskey}}">
-          {{#likes.liked}}
-          <button type="submit" name="action" value="unlike" class="btn btn-sm btn-secondary">{{#str}}unlike, local_mindscape_feed{{/str}}</button>
-          {{/likes.liked}}
-          {{^likes.liked}}
-          <button type="submit" name="action" value="like" class="btn btn-sm btn-outline-secondary">{{#str}}like, local_mindscape_feed{{/str}}</button>
-          {{/likes.liked}}
-          <span class="ms-1 mindscape-like-count">{{likes.count}}</span>
-        </form>
-        {{#isowner}}
-        <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
-        {{/isowner}}
-        {{#canmoderate}}
-        <a href="{{editurl}}" class="btn btn-sm btn-outline-secondary me-2">{{#str}}edit, local_mindscape_feed{{/str}}</a>
-        <form method="post" action="{{{deleteformaction}}}" class="d-inline" onsubmit="return confirm('{{#str}}confirmdelete, local_mindscape_feed{{/str}}');">
-          <input type="hidden" name="postid" value="{{id}}">
-          <input type="hidden" name="sesskey" value="{{../../sesskey}}">
-          <button class="btn btn-sm btn-outline-danger">{{#str}}delete, local_mindscape_feed{{/str}}</button>
-        </form>
-        {{/canmoderate}}
+        <!-- Reaction buttons for profile posts: like and dislike counts. -->
+        <div class="d-flex align-items-center mb-2">
+          <form class="d-inline me-1" method="post" action="{{likeformaction}}">
+            <input type="hidden" name="postid" value="{{id}}">
+            <input type="hidden" name="sesskey" value="{{../../sesskey}}">
+            {{#likes.liked}}
+              <button type="submit" name="action" value="unlike" class="btn btn-sm btn-link p-0 text-primary" title="{{#str}}unlike, local_mindscape_feed{{/str}}">👍</button>
+            {{/likes.liked}}
+            {{^likes.liked}}
+              <button type="submit" name="action" value="like" class="btn btn-sm btn-link p-0" title="{{#str}}like, local_mindscape_feed{{/str}}">👍</button>
+            {{/likes.liked}}
+          </form>
+          <span class="me-2 small">{{likes.count}}</span>
+          <form class="d-inline me-1" method="post" action="{{dislikeformaction}}">
+            <input type="hidden" name="postid" value="{{id}}">
+            <input type="hidden" name="sesskey" value="{{../../sesskey}}">
+            {{#dislikes.disliked}}
+              <button type="submit" name="action" value="undislike" class="btn btn-sm btn-link p-0 text-danger" title="{{#str}}undislike, local_mindscape_feed{{/str}}">👎</button>
+            {{/dislikes.disliked}}
+            {{^dislikes.disliked}}
+              <button type="submit" name="action" value="dislike" class="btn btn-sm btn-link p-0" title="{{#str}}dislike, local_mindscape_feed{{/str}}">👎</button>
+            {{/dislikes.disliked}}
+          </form>
+          <span class="me-2 small">{{dislikes.count}}</span>
+        </div>
         <section class="comments mt-3">
           {{#comments}}
           <div class="d-flex align-items-start gap-2 mb-2">
