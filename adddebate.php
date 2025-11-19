@@ -41,6 +41,14 @@ $PAGE->set_heading(get_string('navadddebate', 'local_mindscape_feed'));
 // Load the custom stylesheet for a consistent appearance with the feed.
 $PAGE->requires->css('/local/mindscape_feed/styles.css');
 
+// Determine whether the Kialo activity plugin is installed.  This check is
+// used to decide if the automatic creation option should be offered to the
+// moderator and to validate requests.  We retrieve the list of installed
+// activity modules using core_component.
+require_once($CFG->libdir . '/componentlib.class.php');
+$installedmods = core_component::get_plugin_list('mod');
+$kialopluginavailable = array_key_exists('kialo', $installedmods);
+
 $errors = [];
 
 if (data_submitted() && confirm_sesskey()) {
@@ -62,22 +70,23 @@ if (data_submitted() && confirm_sesskey()) {
         $errors[] = get_string('err_weekstart_required', 'local_mindscape_feed');
     }
 
-    // If the moderator has opted to auto-create the Kialo activity, override
-    // the provided course module id by creating a new activity via the helper.
-    if ($autocreatekialo) {
-        // Require the helper class only if needed.
-        require_once($CFG->dirroot . '/local/mindscape_feed/classes/local/kialo_helper.php');
-        try {
-            // Create a new hidden Kialo activity using the debate title and description.
-            $kialocmid = \local_mindscape_feed\local\kialo_helper::ensure_cmid_for_debate($title, $description);
-        } catch (Throwable $e) {
-            // Append a generic error message; do not expose internal exception details.
-            $errors[] = get_string('err_couldnotcreate', 'local_mindscape_feed');
+    // Decide whether to auto-create a Kialo activity.  Only attempt auto
+    // creation if the checkbox is ticked, no manual CMID is provided and the
+    // Kialo plugin is available.  If the plugin is unavailable, record an error.
+    if ($autocreatekialo && empty($kialocmid)) {
+        if (!$kialopluginavailable) {
+            $errors[] = get_string('err_kialonotinstalled', 'local_mindscape_feed');
+        } else {
+            require_once($CFG->dirroot . '/local/mindscape_feed/classes/local/kialo_helper.php');
+            try {
+                $kialocmid = \local_mindscape_feed\local\kialo_helper::ensure_cmid_for_debate($title, $description);
+            } catch (Throwable $e) {
+                $errors[] = get_string('err_autocreate_failed', 'local_mindscape_feed');
+            }
         }
     } else {
-        // If not auto-creating, validate Kialo CMID if provided.  Ensure that a mod_kialo course module exists with this id.
+        // Validate manually provided Kialo CMID if it is non-empty.
         if (!empty($kialocmid)) {
-            // Only proceed if the mod_kialo plugin is installed and the module exists.  Use IGNORE_MISSING to suppress exceptions.
             $cmrecord = false;
             try {
                 $cmrecord = get_coursemodule_from_id('kialo', $kialocmid, 0, false, IGNORE_MISSING);
@@ -155,19 +164,26 @@ echo html_writer::tag('label', get_string('debate_kialocmid', 'local_mindscape_f
 echo html_writer::empty_tag('input', ['type' => 'number', 'class' => 'form-control', 'name' => 'kialocmid', 'id' => 'kialocmid', 'value' => optional_param('kialocmid', '', PARAM_INT)]);
 echo html_writer::end_div();
 
-// Checkbox to automatically create a Kialo activity in a hidden course.
-echo html_writer::start_div('form-check mb-3');
-// The checkbox is checked by default to encourage automatic creation of Kialo activities.
-echo html_writer::empty_tag('input', [
-    'type' => 'checkbox',
-    'class' => 'form-check-input',
-    'name' => 'autocreatekialo',
-    'id' => 'autocreatekialo',
-    'value' => 1,
-    'checked' => (optional_param('autocreatekialo', 1, PARAM_BOOL)) ? 'checked' : null
-]);
-echo html_writer::tag('label', get_string('autocreatekialo', 'local_mindscape_feed'), ['for' => 'autocreatekialo', 'class' => 'form-check-label']);
-echo html_writer::end_div();
+// Offer automatic Kialo creation only if the Kialo plugin is installed.
+if ($kialopluginavailable) {
+    echo html_writer::start_div('form-check mb-3');
+    echo html_writer::empty_tag('input', [
+        'type' => 'checkbox',
+        'class' => 'form-check-input',
+        'name' => 'autocreatekialo',
+        'id' => 'autocreatekialo',
+        'value' => 1,
+        // Use submitted value to retain state; by default unchecked.
+        'checked' => (optional_param('autocreatekialo', 0, PARAM_BOOL)) ? 'checked' : null
+    ]);
+    echo html_writer::tag('label', get_string('autocreatekialo', 'local_mindscape_feed'), ['for' => 'autocreatekialo', 'class' => 'form-check-label']);
+    echo html_writer::end_div();
+} else {
+    // If the Kialo plugin is unavailable, inform the user that auto creation cannot be used.
+    echo html_writer::start_div('mb-3 text-muted');
+    echo html_writer::tag('small', get_string('autocreateunavailable', 'local_mindscape_feed'));
+    echo html_writer::end_div();
+}
 
 // Submit button.
 echo html_writer::tag('button', get_string('save', 'local_mindscape_feed'), ['type' => 'submit', 'class' => 'btn btn-primary']);

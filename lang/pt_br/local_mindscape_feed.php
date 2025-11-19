@@ -98,6 +98,16 @@ $string['err_invalid_kialocmid'] = 'O ID do módulo Kialo informado é inválido
 // exigir um ID de módulo.  Recomenda-se deixar marcada para simplificar.
 $string['autocreatekialo'] = 'Criar automaticamente uma atividade Kialo (recomendado)';
 
+// Erro exibido quando a criação automática de uma atividade Kialo falha.
+$string['err_autocreate_failed'] = 'Falha ao criar automaticamente a atividade Kialo. Verifique se o plugin Kialo está instalado ou informe manualmente o ID do módulo.';
+
+// Erro quando o moderador tenta criar automaticamente mas o plugin não está instalado.
+$string['err_kialonotinstalled'] = 'A criação automática não está disponível porque o módulo de atividade Kialo não está instalado.';
+
+// Mensagem informativa exibida no formulário de adicionar debate quando o plugin Kialo
+// está ausente e a criação automática não pode ser usada.
+$string['autocreateunavailable'] = 'O plugin Kialo não está instalado; não é possível criar atividades Kialo automaticamente.';
+
 // Strings do sistema de amizade.
 $string['friendrequests'] = 'Solicitações de amizade';
 $string['addfriend'] = 'Adicionar amigo';

@@ -88,6 +88,17 @@ $string['err_invalid_kialocmid'] = 'The specified Kialo module ID is invalid.';
 // a Kialo activity in a hidden course instead of entering a course module ID.
 $string['autocreatekialo'] = 'Automatically create a Kialo activity (recommended)';
 
+// Error shown when the system fails to create a Kialo activity automatically.
+$string['err_autocreate_failed'] = 'Automatic Kialo creation failed. Please ensure the Kialo plugin is installed or provide a module ID.';
+
+// Error when the moderator attempts to auto-create a Kialo activity but the
+// mod_kialo plugin is not installed on this Moodle site.
+$string['err_kialonotinstalled'] = 'Automatic creation is unavailable because the Kialo activity module is not installed.';
+
+// Informational message shown in the add debate form when the Kialo plugin is
+// missing and automatic creation cannot be used.
+$string['autocreateunavailable'] = 'Kialo plugin is not installed; automatic creation of Kialo activities is unavailable.';
+
 // Friend system strings.
 $string['friendrequests'] = 'Friend requests';
 $string['addfriend'] = 'Add friend';
